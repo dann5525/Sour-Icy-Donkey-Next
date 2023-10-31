@@ -98,6 +98,9 @@ const Menue = (props) => {
           .menue-root-class-name {
             margin-bottom: var(--dl-space-space-fourunits);
           }
+          .menue-root-class-name1 {
+            margin-bottom: var(--dl-space-space-fourunits);
+          }
         `}
       </style>
     </>
