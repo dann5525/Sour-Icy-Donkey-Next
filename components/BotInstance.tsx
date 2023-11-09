@@ -1,23 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Web3Auth } from '@web3auth/modal';
 
 import PropTypes from 'prop-types'
+import BotInstanceData from './BotInstanceData'
+import BotInstanceSetUp from './BotInstanceSetup'
 
-import BotInstanceData from './bot-instance-data'
-import BotInstanceSetUp from './bot-instance-set-up'
+interface BotInstanceProps {
+  account?: string;
+  web3auth: Web3Auth | null;
+}
 
-const BotInstance1 = (props) => {
+const BotInstance: React.FC<BotInstanceProps> = (props) => {
+  const [pairName, setPairName] = useState("");
   return (
     <>
-      <div className={`bot-instance1-container ${props.rootClassName} `}>
+      <div className={`bot-instance1-container`}>
         <div className="bot-instance1-container1">
-          <span className="bot-instance1-text">{props.nmrInstance1}</span>
-          <span className="bot-instance1-text1">{props.PairInstance}</span>
+          <span className="bot-instance1-text">#1</span>
+          <span className="bot-instance1-text1">{pairName}</span>
         </div>
         <div className="bot-instance1-container2">
           <div className="bot-instance1-container3"></div>
-          <BotInstanceData rootClassName="bot-instance-data-root-class-name"></BotInstanceData>
+          <BotInstanceData web3auth={props.web3auth} account={props.account} setPairName={setPairName}></BotInstanceData>
           <div className="bot-instance1-container4"></div>
-          <BotInstanceSetUp rootClassName="bot-instance-set-up-root-class-name"></BotInstanceSetUp>
+          <BotInstanceSetUp account={props.account} ></BotInstanceSetUp>
           <div className="bot-instance1-container5"></div>
         </div>
         <div className="bot-instance1-container6"></div>
@@ -102,20 +108,4 @@ const BotInstance1 = (props) => {
   )
 }
 
-BotInstance1.defaultProps = {
-  PairInstance1: 'BTC-USDT',
-  rootClassName: '',
-  nmrInstance1: '#1',
-  nmrInstance11: '#1',
-  PairInstance: 'BTC-USDT',
-}
-
-BotInstance1.propTypes = {
-  PairInstance1: PropTypes.string,
-  rootClassName: PropTypes.string,
-  nmrInstance1: PropTypes.string,
-  nmrInstance11: PropTypes.string,
-  PairInstance: PropTypes.string,
-}
-
-export default BotInstance1
+export default BotInstance

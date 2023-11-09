@@ -1,7 +1,7 @@
 import React from 'react'
 import Head from 'next/head'
 
-const NotFound = (props) => {
+const NotFound = () => {
   return (
     <>
       <div className="not-found-container">

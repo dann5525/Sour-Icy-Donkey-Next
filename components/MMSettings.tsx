@@ -1,57 +1,91 @@
-import React from 'react'
-import Link from 'next/link'
+import React, { useState } from 'react'
 
 import PropTypes from 'prop-types'
+import { dexs, pairs, strategies } from '../config/constants'
 
-const MMSettigns = (props) => {
+interface MMSettingsProps {
+  rootClassName?: string;
+  account?: string;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+}
+
+
+const MMSettings: React.FC<MMSettingsProps> = (props) => {
+
+  const [dex, setDex] = useState(dexs[0].address);
+  const [pair, setPair] = useState(pairs[0].value);
+  const [strategy, setStrategy] = useState(strategies[0].value);
+
+  const handleDex = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setDex(event.target.value);
+  }
+
+  const handlePair = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setPair(event.target.value);
+  }
+
+  const handleStrategy = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setStrategy(event.target.value);
+  }
+
+  const handleNext = () => {
+    localStorage.setItem('dex', dex);
+    localStorage.setItem('pair', pair);
+    localStorage.setItem('strategy', strategy);
+    if(props.setProfileStatus)
+      props.setProfileStatus(2);
+  }
+
+
   return (
     <>
       <div className={`mm-settigns-container ${props.rootClassName} `}>
-        <h1 className="mm-settigns-text">{props.HeadingUP}</h1>
+        <h1 className="mm-settigns-text">Market Maker Settings: </h1>
         <div className="mm-settigns-container-userprofile">
           <div className="mm-settigns-container-name">
-            <span className="mm-settigns-text1">{props.textName1}</span>
-            <select className="mm-settigns-select-exchange">
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <span className="mm-settigns-text1">Exchange: </span>
+            <select className="mm-settigns-select-exchange" onChange={handleDex}>
+              {
+                dexs.map(item => {
+                  return (
+                    <option value={item.address} key={item.index}>
+                      {item.name}
+                    </option>
+                  )
+                })
+              }
             </select>
           </div>
           <div className="mm-settigns-container-e-mail">
-            <span className="mm-settigns-text2">{props.textTelegram}</span>
-            <select className="mm-settigns-select-trading-pair">
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
+            <span className="mm-settigns-text2">Trading Pair: </span>
+            <select className="mm-settigns-select-trading-pair" onChange={handlePair}>
+              {
+                pairs.map(item => {
+                  return (
+                    <option value={item.value} key={item.index}>
+                      {item.name}
+                    </option>
+                  )
+                })
+              }
             </select>
           </div>
           <div className="mm-settigns-container-telegram">
-            <span className="mm-settigns-text3">{props.texttelegram}</span>
-            <select className="mm-settigns-select-strategy">
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
+            <span className="mm-settigns-text3">Base Strategy: </span>
+            <select className="mm-settigns-select-strategy" onChange={handleStrategy}>
+              {
+                strategies.map(item => {
+                  return (
+                    <option value={item.value} key={item.value}>
+                      {item.name}
+                    </option>
+                  )
+                })
+              }
             </select>
           </div>
           <div className="mm-settigns-container-next">
-            <Link href="/onboarding_2_41">
-              <a className="mm-settigns-link button">{props.btnNext}</a>
-            </Link>
+          <a href='javascript:void(0);' className="mm-settigns-link button" onClick={handleNext}>Next</a>
           </div>
         </div>
       </div>
@@ -177,30 +211,14 @@ const MMSettigns = (props) => {
   )
 }
 
-MMSettigns.defaultProps = {
-  textinput_telegram: '',
-  textinput_name: '',
-  textinput_email: '',
-  textName1: 'Exchange:',
-  text: 'Text',
-  HeadingUP: 'Market Maker Settings:',
-  btnNext: 'Next',
-  textTelegram: 'Trading Pair:',
+MMSettings.defaultProps = {
   rootClassName: '',
-  texttelegram: 'Base Strategy:',
+  account: ''
 }
 
-MMSettigns.propTypes = {
-  textinput_telegram: PropTypes.string,
-  textinput_name: PropTypes.string,
-  textinput_email: PropTypes.string,
-  textName1: PropTypes.string,
-  text: PropTypes.string,
-  HeadingUP: PropTypes.string,
-  btnNext: PropTypes.string,
-  textTelegram: PropTypes.string,
+MMSettings.propTypes = {
   rootClassName: PropTypes.string,
-  texttelegram: PropTypes.string,
+  account: PropTypes.string
 }
 
-export default MMSettigns
+export default MMSettings

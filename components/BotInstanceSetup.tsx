@@ -1,148 +1,111 @@
-import React from 'react'
-import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 
-import PropTypes from 'prop-types'
+import { strategies, settings1, settings2, settings3, settings4, settings5 } from '../config/constants';
+import { editInstance } from '../config/apis';
 
-const BotInstanceSetUp = (props) => {
+interface BotInstanceSetupProps {
+  account?: string;
+}
+
+const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
+  const [strategy, setStrategy] = useState("");
+  const [setting1, setSetting1] = useState("");
+  const [setting2, setSetting2] = useState("");
+  const [setting3, setSetting3] = useState("");
+  const [setting4, setSetting4] = useState("");
+  const [setting5, setSetting5] = useState("");
+
+  const saveInstance = async () => {
+    const instance_id = localStorage.getItem("instance_id");
+    const signature = localStorage.getItem("signature");
+    if (props.account && instance_id && signature) {
+      debugger;
+      const result = await editInstance(props?.account, instance_id, signature, strategy, setting1, setting2, setting3, setting4, setting5);
+      console.log(result);
+    }
+  }
+
+  useEffect(() => {
+    const c_strategy = localStorage.getItem("strategy");
+    const c_setting1 = localStorage.getItem("setting1");
+    const c_setting2 = localStorage.getItem("setting2");
+    const c_setting3 = localStorage.getItem("setting3");
+    const c_setting4 = localStorage.getItem("setting4");
+    const c_setting5 = localStorage.getItem("setting5");
+    setStrategy(c_strategy ? c_strategy : "");
+    setSetting1(c_setting1 ? c_setting1 : "");
+    setSetting2(c_setting2 ? c_setting2 : "");
+    setSetting3(c_setting3 ? c_setting3 : "");
+    setSetting4(c_setting4 ? c_setting4 : "");
+    setSetting5(c_setting5 ? c_setting5 : "");
+  }, []);
+
+
   return (
     <>
-      <div className={`bot-instance-set-up-container ${props.rootClassName} `}>
+      <div className={`bot-instance-set-up-container`}>
         <div className="bot-instance-set-up-container1">
           <div className="bot-instance-set-up-container-name">
-            <span className="bot-instance-set-up-text">{props.textName1}</span>
-            <select className="bot-instance-set-up-select-exchange">
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <span className="bot-instance-set-up-text">Strategy</span>
+            <select className="bot-instance-set-up-select-exchange" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStrategy(e.target.value)}>
+              {strategies.map((item) => (
+                (item.value === strategy) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+              ))}
             </select>
           </div>
           <div className="bot-instance-set-up-container-name1">
             <span className="bot-instance-set-up-text1">
-              {props.textName12}
+              Setting 1
             </span>
-            <select className="bot-instance-set-up-select-exchange1">
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <select className="bot-instance-set-up-select-exchange1" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting1(e.target.value)}>
+              {settings1.map((item) => (
+                (item.value === setting1) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+              ))}
             </select>
           </div>
           <div className="bot-instance-set-up-container-name2">
             <span className="bot-instance-set-up-text2">
-              {props.textName11}
+              Setting 2
             </span>
-            <select className="bot-instance-set-up-select-exchange2">
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <select className="bot-instance-set-up-select-exchange2"onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting2(e.target.value)}>
+              {settings2.map((item) => (
+                (item.value === setting2) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+              ))}
             </select>
           </div>
           <div className="bot-instance-set-up-container-name3">
             <span className="bot-instance-set-up-text3">
-              {props.textName113}
+              Setting 3
             </span>
-            <select className="bot-instance-set-up-select-exchange3">
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <select className="bot-instance-set-up-select-exchange3" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting3(e.target.value)}>
+              {settings3.map((item) => (
+                (item.value === setting3) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+              ))}
             </select>
           </div>
           <div className="bot-instance-set-up-container-name4">
             <span className="bot-instance-set-up-text4">
-              {props.textName112}
+              Setting 4
             </span>
-            <select className="bot-instance-set-up-select-exchange4">
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <select className="bot-instance-set-up-select-exchange4" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting4(e.target.value)}>
+              {settings4.map((item) => (
+                (item.value === setting4) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+              ))}
             </select>
           </div>
           <div className="bot-instance-set-up-container-name5">
             <span className="bot-instance-set-up-text5">
-              {props.textName111}
+              Setting 5
             </span>
-            <select className="bot-instance-set-up-select-exchange5">
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 1" selected>
-                Option 1
-              </option>
-              <option value="Option 1">Option 1</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 3">Option 3</option>
+            <select className="bot-instance-set-up-select-exchange5" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting5(e.target.value)}>
+              {settings5.map((item) => (
+                (item.value === setting5) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+              ))}
             </select>
           </div>
         </div>
         <div className="bot-instance-set-up-container-next">
-          <Link href="/onboarding_2_411">
-            <a className="bot-instance-set-up-link button">{props.btnNext}</a>
-          </Link>
+          <a href='javascript:void(0);' className="bot-instance-set-up-link button" onClick={saveInstance}>Save</a>
         </div>
       </div>
       <style jsx>
@@ -325,52 +288,6 @@ const BotInstanceSetUp = (props) => {
       </style>
     </>
   )
-}
-
-BotInstanceSetUp.defaultProps = {
-  buttonWhithdraw1: 'Whithdraw',
-  rootClassName: '',
-  TokenABalanceValue11: '(300$)',
-  TokenABalanceText: 'A Balance:',
-  buttonDeposit: 'Deposit',
-  TokenABalanceValue: '12.5',
-  buttonWhithdraw: 'Whithdraw',
-  textName112: 'Setting: 4',
-  TokenABalanceValue1: '(120$)',
-  textName113: 'Setting: 3',
-  btnNext: 'Save',
-  TokenBBalanceValue: '300',
-  textName1: 'Strategie:',
-  buttonDeposit1: 'Deposit',
-  image_src: 'https://play.teleporthq.io/static/svg/default-img.svg',
-  textName11: 'Setting: 2',
-  image_alt: 'image',
-  TokenBBalanceText: 'B Balance:',
-  textName12: 'Setting 1:',
-  textName111: 'Setting: 5',
-}
-
-BotInstanceSetUp.propTypes = {
-  buttonWhithdraw1: PropTypes.string,
-  rootClassName: PropTypes.string,
-  TokenABalanceValue11: PropTypes.string,
-  TokenABalanceText: PropTypes.string,
-  buttonDeposit: PropTypes.string,
-  TokenABalanceValue: PropTypes.string,
-  buttonWhithdraw: PropTypes.string,
-  textName112: PropTypes.string,
-  TokenABalanceValue1: PropTypes.string,
-  textName113: PropTypes.string,
-  btnNext: PropTypes.string,
-  TokenBBalanceValue: PropTypes.string,
-  textName1: PropTypes.string,
-  buttonDeposit1: PropTypes.string,
-  image_src: PropTypes.string,
-  textName11: PropTypes.string,
-  image_alt: PropTypes.string,
-  TokenBBalanceText: PropTypes.string,
-  textName12: PropTypes.string,
-  textName111: PropTypes.string,
 }
 
 export default BotInstanceSetUp

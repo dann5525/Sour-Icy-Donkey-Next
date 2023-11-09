@@ -2,11 +2,15 @@ import React from 'react'
 
 import PropTypes from 'prop-types'
 
-const Welcome = (props) => {
+interface WelcomeProps {
+  rootClassName?: string;
+}
+
+const Welcome: React.FC<WelcomeProps> = (props) => {
   return (
     <>
       <div className={`welcome-container ${props.rootClassName} `}>
-        <h1 className="welcome-text">{props.heading}</h1>
+        <h1 className="welcome-text">Welcome to Wonderlamb, your Market Making Service</h1>
       </div>
       <style jsx>
         {`
@@ -33,12 +37,10 @@ const Welcome = (props) => {
 
 Welcome.defaultProps = {
   rootClassName: '',
-  heading: 'Welcome to Wonderlamb, your Market Making Service',
 }
 
 Welcome.propTypes = {
   rootClassName: PropTypes.string,
-  heading: PropTypes.string,
 }
 
 export default Welcome

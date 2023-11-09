@@ -1,44 +1,136 @@
-import React from 'react'
-
+import React, { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import { Web3Auth } from "@web3auth/modal";
 import PropTypes from 'prop-types'
 
-const TransferFunds = (props) => {
+import { contractAddresses, pairs } from "../config/constants";
+import { erc20ABI } from '../abis/erc20';
+import { masterCopyABI } from '../abis/masterCopy';
+
+interface TransferFundsProps {
+  rootClassName?: string;
+  account?: string;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+  web3auth?: Web3Auth | null;
+}
+
+const TransferFunds: React.FC<TransferFundsProps> = (props) => {
+  const [tokenPair, setTokenPair] = useState<any | null>(null);
+  const [amountA, setAmountA] = useState(0);
+  const [amountB, setAmountB] = useState(0);
+  const [balanceA, setBalanceA] = useState(0);
+  const [balanceB, setBalanceB] = useState(0);
+
+  const handleAmountA = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountA(Number(event.target.value));
+  }
+
+  const handleAmountB = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountB(Number(event.target.value));
+  }
+
+  const transferToken = async (flag: number) => {
+    const gnosis_addr = localStorage.getItem("gnosis_addr");
+    if (props.web3auth) {
+      const web3authProvider = await props.web3auth.connect();
+      if (web3authProvider) {
+        const provider = new ethers.BrowserProvider(web3authProvider);
+        const signer = await provider.getSigner();
+        const account = await signer.getAddress();
+        if (gnosis_addr) {
+          if (flag === 0) {
+            if (balanceA > 0 && amountA <= balanceA) {
+              const tokenAContract = new ethers.Contract(tokenPair["addresses"][0], JSON.parse(JSON.stringify(erc20ABI)), signer);
+              const amount = ethers.parseUnits(amountA.toString(), 18);
+              await tokenAContract.transfer(gnosis_addr, amount);
+              const balA = await tokenAContract.balanceOf(account);
+              setBalanceA(Number(balA) / 10 ** 18);
+            }
+          } else if (flag === 1) {
+            if (balanceB > 0 && amountB <= balanceB) {
+              const tokenBContract = new ethers.Contract(tokenPair["addresses"][1], JSON.parse(JSON.stringify(erc20ABI)), signer);
+              const amount = ethers.parseUnits(amountB.toString(), 18);
+              await tokenBContract.transfer(gnosis_addr, amount);
+              const balB = await tokenBContract.balanceOf(account);
+              setBalanceB(Number(balB) / 10 ** 18);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const handleNext = () => {
+    if (props.setProfileStatus)
+      props.setProfileStatus(4);
+  }
+
+  useEffect(() => {
+    const init = async () => {
+      const pair = localStorage.getItem("pair");
+      const pair_item = pairs.filter(item => {
+        return item.value === pair;
+      });
+      setTokenPair(pair_item[0]);
+      if (props.web3auth) {
+        const web3authProvider = await props.web3auth.connect();
+        if (web3authProvider) {
+          const provider = new ethers.BrowserProvider(web3authProvider);
+          const signer = await provider.getSigner();
+          const account = await signer.getAddress();
+          const tokenAContract = new ethers.Contract(pair_item[0]["addresses"][0], JSON.parse(JSON.stringify(erc20ABI)), signer);
+          const tokenBContract = new ethers.Contract(pair_item[0]["addresses"][1], JSON.parse(JSON.stringify(erc20ABI)), signer);
+
+          const balA = await tokenAContract.balanceOf(account);
+          const balB = await tokenBContract.balanceOf(account);
+          setBalanceA(Number(balA) / 10 ** 18);
+          setBalanceB(Number(balB) / 10 ** 18);
+        }
+      }
+    }
+
+    init();
+  }, []);
+
+
   return (
     <>
       <div className={`transfer-funds-container ${props.rootClassName} `}>
-        <h1 className="transfer-funds-text">{props.HeadingUP}</h1>
+        <h1 className="transfer-funds-text">Transfer Funds</h1>
         <div className="transfer-funds-container-userprofile">
           <div className="transfer-funds-container-transfer-token-a">
-            <span className="transfer-funds-text1">{props.textName1}</span>
+            <span className="transfer-funds-text1">{tokenPair ? tokenPair.symbols[0] : "Token A:"}</span>
             <div className="transfer-funds-container1">
               <input
-                type="text"
-                placeholder={props.textinput_name11}
+                type="number"
                 className="transfer-funds-textinput input"
+                value={amountA}
+                onChange={handleAmountA}
               />
-              <span>{props.text1}</span>
+              <span>Balance: {balanceA}</span>
             </div>
-            <button type="button" className="transfer-funds-button button">
-              {props.button1}
+            <button type="button" className="transfer-funds-button button" onClick={() => transferToken(0)}>
+              Send
             </button>
           </div>
           <div className="transfer-funds-container-transfer-token-b">
-            <span className="transfer-funds-text3">{props.textTelegram}</span>
+            <span className="transfer-funds-text1">{tokenPair ? tokenPair.symbols[1] : "Token B:"}</span>
             <div className="transfer-funds-container2">
               <input
-                type="text"
-                placeholder={props.textinput_name1}
+                type="number"
                 className="transfer-funds-textinput1 input"
+                value={amountB}
+                onChange={handleAmountB}
               />
-              <span>{props.text}</span>
+              <span>Balance: {balanceB}</span>
             </div>
-            <button type="button" className="transfer-funds-button1 button">
-              {props.button}
+            <button type="button" className="transfer-funds-button1 button" onClick={() => transferToken(1)}>
+              Send
             </button>
           </div>
           <div className="transfer-funds-container-next">
-            <button type="button" className="transfer-funds-button2 button">
-              {props.btnNext}
+            <button type="button" className="transfer-funds-button2 button" onClick={handleNext}>
+              Next
             </button>
           </div>
         </div>
@@ -82,6 +174,7 @@ const TransferFunds = (props) => {
           .transfer-funds-text1 {
             font-size: 32px;
             padding-right: 0px;
+            min-width: 110px;
           }
           .transfer-funds-container1 {
             flex: 0 0 auto;
@@ -92,7 +185,7 @@ const TransferFunds = (props) => {
             flex-direction: column;
           }
           .transfer-funds-textinput {
-            color: var(--dl-color-gray-900);
+            color: black;
             width: var(--dl-size-size-xxlarge);
             background-color: var(--dl-color-gray-900);
           }
@@ -126,7 +219,7 @@ const TransferFunds = (props) => {
             flex-direction: column;
           }
           .transfer-funds-textinput1 {
-            color: var(--dl-color-gray-900);
+            color: black;
             width: var(--dl-size-size-xxlarge);
             background-color: var(--dl-color-gray-900);
           }
@@ -163,37 +256,13 @@ const TransferFunds = (props) => {
 }
 
 TransferFunds.defaultProps = {
-  btnNext: 'Start Market Making',
-  button2: 'Deploy',
-  textinput_name11: '',
-  textName1: 'Token A:',
-  button1: 'Send',
-  textinput_name: '',
-  text1: 'Balance A:',
   rootClassName: '',
-  text: 'Balance B:',
-  textinput_name1: '',
-  HeadingUP: 'Transfer Funds',
-  button: 'Send',
-  textTelegram: 'Token B:',
-  texttelegram: 'Set Allowances',
+  account: ''
 }
 
 TransferFunds.propTypes = {
-  btnNext: PropTypes.string,
-  button2: PropTypes.string,
-  textinput_name11: PropTypes.string,
-  textName1: PropTypes.string,
-  button1: PropTypes.string,
-  textinput_name: PropTypes.string,
-  text1: PropTypes.string,
   rootClassName: PropTypes.string,
-  text: PropTypes.string,
-  textinput_name1: PropTypes.string,
-  HeadingUP: PropTypes.string,
-  button: PropTypes.string,
-  textTelegram: PropTypes.string,
-  texttelegram: PropTypes.string,
+  account: PropTypes.string
 }
 
 export default TransferFunds

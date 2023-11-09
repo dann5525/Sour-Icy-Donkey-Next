@@ -1,37 +1,39 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import PropTypes from 'prop-types'
 
-const ProgressBar = (props) => {
-  const [checked4, setChecked4] = useState(false)
-  const [checked1, setChecked1] = useState(false)
-  const [checked3, setChecked3] = useState(false)
-  const [checked2, setChecked2] = useState(false)
+interface ProgressBarProps {
+  rootClassName?: string;
+  flag?: number;
+}
+
+
+const ProgressBar: React.FC<ProgressBarProps> = (props) => {
   return (
     <>
       <div className={`progress-bar-container ${props.rootClassName} `}>
         <div className="progress-bar-container01">
           <div className="progress-bar-progress1">
             <div className="progress-bar-container02">
-              {checked1 && <div className="progress-bar-container03"></div>}
+              {(props.flag && props.flag >= 0) && <div className="progress-bar-container03"></div>}
             </div>
           </div>
           <div className="progress-bar-container04"></div>
           <div className="progress-bar-progress2">
             <div className="progress-bar-container05">
-              {checked2 && <div className="progress-bar-container06"></div>}
+              {(props.flag && props.flag >= 1) && <div className="progress-bar-container06"></div>}
             </div>
           </div>
           <div className="progress-bar-container07"></div>
           <div className="progress-bar-progress3">
             <div className="progress-bar-container08">
-              {checked3 && <div className="progress-bar-container09"></div>}
+              {(props.flag && props.flag >= 2) && <div className="progress-bar-container09"></div>}
             </div>
           </div>
           <div className="progress-bar-container10"></div>
           <div className="progress-bar-progress4">
             <div className="progress-bar-container11">
-              {checked4 && <div className="progress-bar-container12"></div>}
+              {(props.flag && props.flag >= 3) && <div className="progress-bar-container12"></div>}
             </div>
           </div>
         </div>
@@ -252,10 +254,12 @@ const ProgressBar = (props) => {
 
 ProgressBar.defaultProps = {
   rootClassName: '',
+  flag: 0
 }
 
 ProgressBar.propTypes = {
   rootClassName: PropTypes.string,
+  flag: PropTypes.number
 }
 
 export default ProgressBar

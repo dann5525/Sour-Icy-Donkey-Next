@@ -1,42 +1,95 @@
-import React from 'react'
-import Link from 'next/link'
-
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const CreateUP = (props) => {
+import { createProfile, getProfile } from '../config/apis';
+
+interface CreateUPProps {
+  rootClassName?: string;
+  account?: string;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+}
+
+const CreateUP: React.FC<CreateUPProps> = (props) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [telegram, setTelegram] = useState("");
+
+  const handleName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  }
+
+  const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value)
+  }
+
+  const handleTelegram = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTelegram(event.target.value);
+  }
+
+
+  const handleCreate = async () => {
+    if (name?.trim().length === 0) {
+
+    } else if (email?.trim().length === 0) {
+
+    } else if (telegram?.trim().length === 0) {
+
+    } else {
+      if (props?.account) {
+        const userinfo = await createProfile(props?.account, name, email, telegram);
+        if (userinfo) {
+          const signature = localStorage.getItem("signature");
+          if (signature) {
+            const profileRes = await getProfile(props?.account, signature);
+            if (profileRes.result) {
+              localStorage.setItem("user_id", profileRes.result.profile._id);
+              localStorage.setItem("email", profileRes.result.profile.email);
+              localStorage.setItem("name", profileRes.result.profile.name);
+              localStorage.setItem("telegram", profileRes.result.profile.telegram);
+              props.setProfileStatus ? props.setProfileStatus(1) : "";
+            } else {
+              props.setProfileStatus ? props.setProfileStatus(0) : "";
+            }
+          }
+        }
+      }
+    }
+  }
+
   return (
     <>
       <div className={`create-up-container ${props.rootClassName} `}>
-        <h1 className="create-up-text">{props.HeadingUP}</h1>
+        <h1 className="create-up-text">Create User Profile: </h1>
         <div className="create-up-container-userprofile">
           <div className="create-up-container-name">
-            <span className="create-up-text1">{props.textName1}</span>
+            <span className="create-up-text1">Name: </span>
             <input
               type="text"
-              placeholder={props.textinput_name}
+              value={name}
+              onChange={handleName}
               className="create-up-textinput input"
             />
           </div>
           <div className="create-up-container-e-mail">
-            <span className="create-up-text2">{props.textTelegram}</span>
+            <span className="create-up-text2">E-Mail: </span>
             <input
               type="text"
-              placeholder={props.textinput_email}
+              value={email}
+              onChange={handleEmail}
               className="create-up-textinput1 input"
             />
           </div>
           <div className="create-up-container-telegram">
-            <span className="create-up-text3">{props.texttelegram}</span>
+            <span className="create-up-text3">Telegram: </span>
             <input
               type="text"
-              placeholder={props.textinput_telegram}
+              value={telegram}
+              onChange={handleTelegram}
               className="create-up-textinput2 input"
             />
           </div>
           <div className="create-up-container-next">
-            <Link href="/onboarding_2_4">
-              <a className="create-up-link button">{props.btnNext}</a>
-            </Link>
+            <button className="create-up-link button" onClick={handleCreate}>Create</button>
           </div>
         </div>
       </div>
@@ -81,7 +134,6 @@ const CreateUP = (props) => {
             padding-right: 0px;
           }
           .create-up-textinput {
-            color: var(--dl-color-gray-900);
             width: var(--dl-size-size-xxlarge);
             background-color: var(--dl-color-gray-900);
           }
@@ -149,29 +201,13 @@ const CreateUP = (props) => {
 }
 
 CreateUP.defaultProps = {
-  textinput_name: '',
-  texttelegram: 'Telegram:',
   rootClassName: '',
-  textName1: 'Name:',
-  textTelegram: 'E-Mail:',
-  btnNext: 'Next',
-  HeadingUP: 'Create User Profile:',
-  texttelegram1: 'Telegram:',
-  textinput_telegram: '',
-  textinput_email: '',
+  account: ''
 }
 
 CreateUP.propTypes = {
-  textinput_name: PropTypes.string,
-  texttelegram: PropTypes.string,
   rootClassName: PropTypes.string,
-  textName1: PropTypes.string,
-  textTelegram: PropTypes.string,
-  btnNext: PropTypes.string,
-  HeadingUP: PropTypes.string,
-  texttelegram1: PropTypes.string,
-  textinput_telegram: PropTypes.string,
-  textinput_email: PropTypes.string,
+  account: PropTypes.string
 }
 
 export default CreateUP

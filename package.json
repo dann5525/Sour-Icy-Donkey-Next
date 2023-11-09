@@ -1,28 +1,42 @@
 {
-  "name": "sour-icy-donkey",
-  "version": "1.0.0",
-  "description": "A next project generated based on a UIDL document",
-  "main": "index.js",
+  "name": "hummingbot-next",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "next",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "export": "next export"
+    "lint": "next lint"
   },
-  "author": "TeleportHQ",
-  "license": "MIT",
   "dependencies": {
-    "next": "^12.1.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "prop-types": "15.7.2"
-  },
-  "engines": {
-    "node": ">=18.x"
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.16",
+    "@mui/material": "^5.14.17",
+    "@walletconnect/sign-client": "^2.10.4",
+    "@web3auth/base": "^7.0.1",
+    "@web3auth/metamask-adapter": "^7.0.1",
+    "@web3auth/modal": "^7.0.2",
+    "@web3auth/torus-evm-adapter": "^7.0.1",
+    "@web3auth/torus-wallet-connector-plugin": "^7.0.1",
+    "@web3auth/wallet-connect-v2-adapter": "^7.0.2",
+    "ethers": "^6.6.2",
+    "i18n": "^0.15.1",
+    "next": "^12.3.1",
+    "react": "18",
+    "react-dom": "18",
+    "web3": "^4.1.1"
   },
   "devDependencies": {
-    "tailwindcss": "^3.0.24",
-    "autoprefixer": "^10.4.7",
-    "postcss": "^8.4.14"
+    "@types/elliptic": "^6.4.14",
+    "@types/node": "18",
+    "@types/react": "18",
+    "@types/react-dom": "18",
+    "eslint": "8.25.0",
+    "eslint-config-next": "12.3.1",
+    "postcss-preset-env": "^9.2.0",
+    "tailwindcss": "^3.3.5",
+    "typescript": "4.8.4",
+    "zlib-browserify": "^0.0.3"
   }
 }

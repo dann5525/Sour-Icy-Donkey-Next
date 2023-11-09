@@ -1,28 +1,30 @@
 import React from 'react'
 
-import PropTypes from 'prop-types'
+interface MenuProps {
+  account?: string;
+}
 
-const Menue = (props) => {
+const Menu: React.FC<MenuProps> = (props) => {
   return (
     <>
-      <div className={`menue-container ${props.rootClassName} `}>
+      <div className={`menue-container menue-root-class-name`}>
         <div className="menue-container1">
           <button type="button" className="menue-btn-dashboard button">
-            {props.btnMenuDashboard}
+            Dashboard
           </button>
           <button type="button" className="menue-btn-services button">
-            {props.btnMenuServices}
+            Services
           </button>
           <button type="button" className="menue-btn-services1 button">
-            {props.btnMenuBilling}
+            Billing
           </button>
         </div>
         <div className="menue-container2">
           <button type="button" className="menue-btn-profile button">
-            {props.btnProfile}
+            Profile
           </button>
           <button type="button" className="menue-btn-web3 button">
-            {props.btnWeb3}
+            {props.account?props.account.substr(0, 10)+"...":"..."}
           </button>
         </div>
       </div>
@@ -98,31 +100,10 @@ const Menue = (props) => {
           .menue-root-class-name {
             margin-bottom: var(--dl-space-space-fourunits);
           }
-          .menue-root-class-name1 {
-            margin-bottom: var(--dl-space-space-fourunits);
-          }
         `}
       </style>
     </>
   )
 }
 
-Menue.defaultProps = {
-  btnProfile: 'Profile',
-  rootClassName: '',
-  btnMenuBilling: 'Billing',
-  btnMenuDashboard: 'Dashboard',
-  btnWeb3: '0x84f87..',
-  btnMenuServices: 'Services',
-}
-
-Menue.propTypes = {
-  btnProfile: PropTypes.string,
-  rootClassName: PropTypes.string,
-  btnMenuBilling: PropTypes.string,
-  btnMenuDashboard: PropTypes.string,
-  btnWeb3: PropTypes.string,
-  btnMenuServices: PropTypes.string,
-}
-
-export default Menue
+export default Menu
