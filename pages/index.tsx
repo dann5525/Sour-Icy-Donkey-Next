@@ -51,8 +51,8 @@ function App() {
         const active_provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await active_provider.getSigner();
         const active_account = await signer.getAddress();
-
         setAccount(active_account);
+        localStorage.setItem("account", active_account);
         const res = await getChallenge(active_account);
         if (res.result !== null) {
           const signature = await signMessage(res.result.challenge);
@@ -90,7 +90,6 @@ function App() {
                   localStorage.removeItem("allowed");
                   setProfileStatus(1);
                 }
-
               } else {
                 localStorage.removeItem("user_id");
                 localStorage.removeItem("name");
@@ -127,6 +126,8 @@ function App() {
     await web3auth.logout();
     setProvider(null);
     setLoggedIn(false);
+    setProfileStatus(0);
+    localStorage.clear();
   };
 
   const signMessage = async (message: string) => {
@@ -260,6 +261,34 @@ function App() {
 
         setWeb3auth(web3auth);
         await web3auth.initModal();
+        const c_expire_time = localStorage.getItem("expire_time");
+        const c_time = new Date();
+        const c_timestamp = c_time.getTime();
+        if (Number(c_timestamp) < Number(c_expire_time) * 1000) {
+          setLoggedIn(true);
+          await web3auth.connect();
+          const c_account = localStorage.getItem("account");
+          if (c_account)
+            setAccount(c_account);
+          const user_id = localStorage.getItem("user_id");
+          if (user_id) {
+            const dex = localStorage.getItem("dex");
+            if (dex) {
+              const instance_id = localStorage.getItem("instance_id");
+              if (instance_id) {
+                setProfileStatus(4);
+              } else {
+                setProfileStatus(2);
+              }
+            } else {
+              setProfileStatus(1);
+            }
+          } else {
+            setProfileStatus(0);
+          }
+        } else {
+          setLoggedIn(false);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -304,7 +333,7 @@ function App() {
               <ProgressBar rootClassName="progress-bar-root-class-name" flag={profileStatus}></ProgressBar>
             }
             {profileStatus === 4 &&
-              <Menu account={account}></Menu>
+              <Menu account={account} logout={logout}></Menu>
             }
             {profileStatus === 0 &&
               <CreateUP rootClassName="create-up-root-class-name" account={account} setProfileStatus={setProfileStatus}></CreateUP>

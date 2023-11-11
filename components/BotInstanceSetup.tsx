@@ -2,10 +2,53 @@ import React, { useEffect, useState } from 'react'
 
 import { strategies, settings1, settings2, settings3, settings4, settings5 } from '../config/constants';
 import { editInstance } from '../config/apis';
+import { Alert, Snackbar, Stack, Switch, TextField, Typography, styled } from '@mui/material';
 
 interface BotInstanceSetupProps {
   account?: string;
 }
+
+const AntSwitch = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.mode === 'dark' ? '#177ddc' : '#1890ff',
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
 
 const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
   const [strategy, setStrategy] = useState("");
@@ -13,15 +56,45 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
   const [setting2, setSetting2] = useState("");
   const [setting3, setSetting3] = useState("");
   const [setting4, setSetting4] = useState("");
-  const [setting5, setSetting5] = useState("");
+  const [setting5, setSetting5] = useState(0);
+  const [message, setMessage] = useState("");
+  const [sopen, setSopen] = useState(false);
+
+  const handleSetting1 = () => {
+    if (setting1 === "y")
+      setSetting1("n");
+    else
+      setSetting1("y");
+  }
+
+  const handleSetting2 = () => {
+    if (setting2 === "y")
+      setSetting2("n");
+    else
+      setSetting2("y");
+  }
+
+  const handleSClose = () => {
+    setSopen(false);
+  }
 
   const saveInstance = async () => {
     const instance_id = localStorage.getItem("instance_id");
     const signature = localStorage.getItem("signature");
     if (props.account && instance_id && signature) {
-      debugger;
-      const result = await editInstance(props?.account, instance_id, signature, strategy, setting1, setting2, setting3, setting4, setting5);
-      console.log(result);
+      try {
+        const res = await editInstance(props?.account, instance_id, signature, strategy, setting1, setting2, setting3, setting4, setting5.toString());
+        localStorage.setItem("strategy", strategy);
+        localStorage.setItem("setting1", setting1);
+        localStorage.setItem("setting2", setting2);
+        localStorage.setItem("setting3", setting3);
+        localStorage.setItem("setting4", setting4);
+        localStorage.setItem("setting5", setting5.toString());
+        setMessage(res?.result);
+        setSopen(true);
+      } catch (err: any) {
+        setMessage(err.message);
+      }
     }
   }
 
@@ -37,7 +110,7 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
     setSetting2(c_setting2 ? c_setting2 : "");
     setSetting3(c_setting3 ? c_setting3 : "");
     setSetting4(c_setting4 ? c_setting4 : "");
-    setSetting5(c_setting5 ? c_setting5 : "");
+    setSetting5(c_setting5 ? Number(c_setting5) : 0);
   }, []);
 
 
@@ -57,21 +130,23 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
             <span className="bot-instance-set-up-text1">
               Setting 1
             </span>
-            <select className="bot-instance-set-up-select-exchange1" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting1(e.target.value)}>
-              {settings1.map((item) => (
-                (item.value === setting1) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
-              ))}
-            </select>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "192px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Typography>No</Typography>
+              {setting1 === "y" && <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} onChange={handleSetting1} />}
+              {setting1 === "n" && <AntSwitch inputProps={{ 'aria-label': 'ant design' }} onChange={handleSetting1} />}
+              <Typography>Yes</Typography>
+            </Stack>
           </div>
           <div className="bot-instance-set-up-container-name2">
             <span className="bot-instance-set-up-text2">
               Setting 2
             </span>
-            <select className="bot-instance-set-up-select-exchange2"onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting2(e.target.value)}>
-              {settings2.map((item) => (
-                (item.value === setting2) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
-              ))}
-            </select>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "192px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Typography>No</Typography>
+              {setting2 === "y" && <AntSwitch defaultChecked inputProps={{ 'aria-label': 'ant design' }} onChange={handleSetting2} />}
+              {setting2 === "n" && <AntSwitch inputProps={{ 'aria-label': 'ant design' }} onChange={handleSetting2} />}
+              <Typography>Yes</Typography>
+            </Stack>
           </div>
           <div className="bot-instance-set-up-container-name3">
             <span className="bot-instance-set-up-text3">
@@ -97,17 +172,23 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
             <span className="bot-instance-set-up-text5">
               Setting 5
             </span>
-            <select className="bot-instance-set-up-select-exchange5" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting5(e.target.value)}>
-              {settings5.map((item) => (
-                (item.value === setting5) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
-              ))}
-            </select>
+            <TextField type='number'
+              sx={{ width: "192px", height: "36px" }}
+              inputProps={{ style: { height: "36px", padding: "4px 10px" } }}
+              value={setting5}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetting5(Number(event.target.value))}>
+            </TextField>
           </div>
         </div>
         <div className="bot-instance-set-up-container-next">
           <a href='javascript:void(0);' className="bot-instance-set-up-link button" onClick={saveInstance}>Save</a>
         </div>
       </div>
+      <Snackbar open={sopen} autoHideDuration={3000} onClose={handleSClose}>
+        <Alert onClose={handleSClose} severity="success" sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
       <style jsx>
         {`
           .bot-instance-set-up-container {

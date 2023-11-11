@@ -9,7 +9,6 @@ interface MMSettingsProps {
   setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
 }
 
-
 const MMSettings: React.FC<MMSettingsProps> = (props) => {
 
   const [dex, setDex] = useState(dexs[0].address);

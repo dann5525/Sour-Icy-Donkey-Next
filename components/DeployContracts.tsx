@@ -57,20 +57,17 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
 
   const handleNext = async () => {
     const signature = localStorage.getItem("signature");
-    const owner = localStorage.getItem("user_id");
     const pair = localStorage.getItem("pair");
     const dex = localStorage.getItem("dex");
     const safe_address = localStorage.getItem("gnosis_addr");
     const trade_module = localStorage.getItem("gnosis_module");
     const strategy = localStorage.getItem("strategy");
-    if (props.account && signature && owner && pair && dex && safe_address && trade_module && strategy) {
-      const instance = await createInstance(props?.account, signature, owner, pair, dex, safe_address, trade_module, "kava", strategy, "y", "y", "y", "y", "y");
-      if (instance.result && props.setProfileStatus)
+    if (props.account && signature && pair && dex && safe_address && trade_module && strategy) {
+      const instance = await createInstance(props?.account, signature, pair, dex, safe_address, trade_module, "kava", strategy, "y", "y", "y", "y", "1");
+      if (instance.result && props.setProfileStatus) {
         props.setProfileStatus(3);
+      }
     }
-    // if (userinfo) {
-    //   props.setProfileStatus ? props.setProfileStatus(1) : "";
-    // }
   }
 
   useEffect(() => {

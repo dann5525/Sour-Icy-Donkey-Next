@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Web3Auth } from '@web3auth/modal';
 import { Box, Typography, Button, Modal, TextField, Snackbar, Alert } from '@mui/material';
 import PropTypes from 'prop-types'
@@ -55,8 +55,6 @@ const BotInstanceData: React.FC<BotInstanceDataProps> = (props) => {
       setSnackbarTxt("No holding token.");
       setSopen(true);
     }
-    setMflag(2);
-    setOpen(true);
   }
 
   const handleDeposit2 = () => {
@@ -98,7 +96,7 @@ const BotInstanceData: React.FC<BotInstanceDataProps> = (props) => {
       if (props.web3auth && safe_address)
         await transferToken(props.web3auth, tokenPair["addresses"][0], safe_address, amount, true);
       setOpen(false);
-      if(props.web3auth && props.account && safe_address) {
+      if (props.web3auth && props.account && safe_address) {
         const balA = await tokenBalance(props.web3auth, tokenPair["addresses"][0], props.account);
         const holdingBalA = await tokenBalance(props.web3auth, tokenPair["addresses"][0], safe_address);
         setBalanceA(balA);
@@ -109,7 +107,7 @@ const BotInstanceData: React.FC<BotInstanceDataProps> = (props) => {
       if (props.web3auth && safe_address)
         await transferToken(props.web3auth, tokenPair["addresses"][0], safe_address, amount, false);
       setOpen(false);
-      if(props.web3auth && props.account && safe_address) {
+      if (props.web3auth && props.account && safe_address) {
         const balA = await tokenBalance(props.web3auth, tokenPair["addresses"][0], props.account);
         const holdingBalA = await tokenBalance(props.web3auth, tokenPair["addresses"][0], safe_address);
         setBalanceA(balA);
@@ -120,7 +118,7 @@ const BotInstanceData: React.FC<BotInstanceDataProps> = (props) => {
       if (props.web3auth && safe_address)
         await transferToken(props.web3auth, tokenPair["addresses"][1], safe_address, amount, true);
       setOpen(false);
-      if(props.web3auth && props.account && safe_address) {
+      if (props.web3auth && props.account && safe_address) {
         const balB = await tokenBalance(props.web3auth, tokenPair["addresses"][1], props.account);
         const holdingBalB = await tokenBalance(props.web3auth, tokenPair["addresses"][1], safe_address);
         setBalanceB(balB);
@@ -131,7 +129,7 @@ const BotInstanceData: React.FC<BotInstanceDataProps> = (props) => {
       if (props.web3auth && safe_address)
         await transferToken(props.web3auth, tokenPair["addresses"][1], safe_address, amount, false);
       setOpen(false);
-      if(props.web3auth && props.account && safe_address) {
+      if (props.web3auth && props.account && safe_address) {
         const balB = await tokenBalance(props.web3auth, tokenPair["addresses"][1], props.account);
         const holdingBalB = await tokenBalance(props.web3auth, tokenPair["addresses"][1], safe_address);
         setBalanceB(balB);
@@ -152,7 +150,8 @@ const BotInstanceData: React.FC<BotInstanceDataProps> = (props) => {
         return item.value === pair;
       });
       setTokenPair(pair_item[0]);
-      props.setPairName ? props.setPairName(pair_item[0]["name"]) : "";
+      if (props.setPairName && pair_item[0])
+        props.setPairName(pair_item[0]["name"]);
       if (props.web3auth && props.account && safe_address) {
         const balA = await tokenBalance(props.web3auth, pair_item[0]["addresses"][0], props.account);
         const balB = await tokenBalance(props.web3auth, pair_item[0]["addresses"][1], props.account);

@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Box, Typography, Button, Modal, TextField, Snackbar, Alert } from '@mui/material';
 
 interface MenuProps {
   account?: string;
+  logout?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 500,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  display: "flex",
+  justifyContent: "center",
+  p: 4,
+};
+
 const Menu: React.FC<MenuProps> = (props) => {
+  const [open, setOpen] = useState(false);
+
+  const handleMOpen = () => {
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
   return (
     <>
       <div className={`menue-container menue-root-class-name`}>
@@ -23,10 +49,22 @@ const Menu: React.FC<MenuProps> = (props) => {
           <button type="button" className="menue-btn-profile button">
             Profile
           </button>
-          <button type="button" className="menue-btn-web3 button">
+          <button type="button" className="menue-btn-web3 button" onClick={handleMOpen}>
             {props.account?props.account.substr(0, 10)+"...":"..."}
           </button>
         </div>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          className="modal-dialog modal-lg"
+
+        >
+          <Box sx={style}>
+            {props?.logout && <Button type='button' size='large' variant='contained' color='error' onClick={props.logout} sx={{ width:"80%" }}>Logout</Button>}
+          </Box>
+        </Modal>
       </div>
       <style jsx>
         {`
