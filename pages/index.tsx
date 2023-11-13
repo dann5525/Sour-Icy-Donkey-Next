@@ -265,26 +265,36 @@ function App() {
         const c_time = new Date();
         const c_timestamp = c_time.getTime();
         if (Number(c_timestamp) < Number(c_expire_time) * 1000) {
-          setLoggedIn(true);
-          await web3auth.connect();
-          const c_account = localStorage.getItem("account");
-          if (c_account)
-            setAccount(c_account);
-          const user_id = localStorage.getItem("user_id");
-          if (user_id) {
-            const dex = localStorage.getItem("dex");
-            if (dex) {
-              const instance_id = localStorage.getItem("instance_id");
-              if (instance_id) {
-                setProfileStatus(4);
+          const web3authProvider = await web3auth.connect();
+          if (web3authProvider) {
+            const provider = new ethers.BrowserProvider(web3authProvider);
+            const signer = await provider.getSigner();
+            const c_account = await signer.getAddress();
+            const o_account = localStorage.getItem("account");
+            if (o_account && c_account.toLowerCase() === o_account?.toLowerCase()) {
+              setLoggedIn(true);
+              setAccount(o_account);
+              const user_id = localStorage.getItem("user_id");
+              if (user_id) {
+                const dex = localStorage.getItem("dex");
+                if (dex) {
+                  const instance_id = localStorage.getItem("instance_id");
+                  if (instance_id) {
+                    setProfileStatus(4);
+                  } else {
+                    setProfileStatus(2);
+                  }
+                } else {
+                  setProfileStatus(1);
+                }
               } else {
-                setProfileStatus(2);
+                setProfileStatus(0);
               }
             } else {
-              setProfileStatus(1);
+              localStorage.clear();
+              setLoggedIn(false);
+              setProfileStatus(0);
             }
-          } else {
-            setProfileStatus(0);
           }
         } else {
           setLoggedIn(false);
