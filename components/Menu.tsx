@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Box, Typography, Button, Modal, TextField, Snackbar, Alert } from '@mui/material';
+import Link from 'next/link';
 
 interface MenuProps {
   account?: string;
@@ -46,11 +47,13 @@ const Menu: React.FC<MenuProps> = (props) => {
           </button>
         </div>
         <div className="menue-container2">
-          <button type="button" className="menue-btn-profile button">
-            Profile
-          </button>
+          <Link href="/profile">
+            <button type="button" className="menue-btn-profile button" style={{ cursor:"pointer" }}>
+              Profile
+            </button>
+          </Link>
           <button type="button" className="menue-btn-web3 button" onClick={handleMOpen}>
-            {props.account?props.account.substr(0, 10)+"...":"..."}
+            {props.account ? props.account.substr(0, 10) + "..." : "..."}
           </button>
         </div>
         <Modal
@@ -62,7 +65,7 @@ const Menu: React.FC<MenuProps> = (props) => {
 
         >
           <Box sx={style}>
-            {props?.logout && <Button type='button' size='large' variant='contained' color='error' onClick={props.logout} sx={{ width:"80%" }}>Logout</Button>}
+            {props?.logout && <Button type='button' size='large' variant='contained' color='error' onClick={props.logout} sx={{ width: "80%" }}>Logout</Button>}
           </Box>
         </Modal>
       </div>

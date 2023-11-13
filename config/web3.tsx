@@ -46,18 +46,16 @@ export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | n
     return null;
 }
 
-export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, dexAddress: string): Promise<string | null> => {
+export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, instance_public_key: string, dexAddress: string): Promise<string | null> => {
     const web3authProvider = await web3auth.connect();
     if (web3authProvider) {
-        const rpc = new RPC(web3authProvider);
         const provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await provider.getSigner();
-        const accounts = await rpc.getAccounts();
 
         // Contract instances
         const uupsDexFactory = new ethers.Contract(contractAddresses.uupsDEXModuleFactory, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
 
-        const createModuleTx = await uupsDexFactory.createModule(gnosisAddress, accounts[0], dexAddress);
+        const createModuleTx = await uupsDexFactory.createModule(gnosisAddress, instance_public_key, dexAddress);
 
         // Wait for the transaction
         const receipt = await createModuleTx.wait();
@@ -144,9 +142,10 @@ export const tokenBalance = async (web3auth: Web3Auth, token_address: string, sa
         const provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await provider.getSigner();
         const tokenContract = new ethers.Contract(token_address, JSON.parse(JSON.stringify(erc20ABI)), signer);
-
         const balance = await tokenContract.balanceOf(safe_address);
-        return Number(balance) / 10 ** 18;
+        const decimal = await tokenContract.decimals();
+        console.log(decimal);
+        return Number(balance) / 10 ** Number(decimal);
     }
     return 0;
 }
@@ -157,8 +156,10 @@ export const transferToken = async (web3auth: Web3Auth, tokenAddr: string, toAdd
         const provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await provider.getSigner();
         const account = await signer.getAddress();
-        const tAmount = ethers.parseUnits(amount.toString(), 18);
         const tokenContract = new ethers.Contract(tokenAddr, JSON.parse(JSON.stringify(erc20ABI)), signer);
+        const decimal = await tokenContract.decimals();
+        console.log(decimal);
+        const tAmount = ethers.parseUnits(amount.toString(), Number(decimal));
         if (flag) {
             const transferTx = await tokenContract.transferFrom(account, toAddr, tAmount);
             await transferTx.wait();

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { deploySafeContract, createModule, allowPair } from '../config/web3';
 import { Web3Auth } from '@web3auth/modal';
 
-import { createInstance } from '../config/apis';
+import { createInstance, editInstance, getInstance } from '../config/apis';
 
 interface DeployContractsProps {
   rootClassName?: string;
@@ -18,9 +18,18 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
   const deployGnosis = async () => {
     if (props.web3auth) {
       const gnosis_addr = await deploySafeContract(props.web3auth);
-      if (gnosis_addr != null && typeof gnosis_addr == "string") {
+      if (gnosis_addr !== null && typeof gnosis_addr === "string") {
         localStorage.setItem("gnosis_addr", gnosis_addr);
-        setFlag(1);
+        const signature = localStorage.getItem("signature");
+        const pair = localStorage.getItem("pair");
+        const dex = localStorage.getItem("dex");
+        const strategy = localStorage.getItem("strategy");
+        if (props.account && signature && pair && dex && strategy) {
+          const instance = await createInstance(props?.account, signature, pair, dex, gnosis_addr, "", "kava", strategy, "y", "y", "y", "y", "1");
+          if (instance.result && props.setProfileStatus) {
+            setFlag(1);
+          }
+        }
       }
     }
   }
@@ -29,11 +38,16 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
     if (props.web3auth) {
       const gnosis_addr = localStorage.getItem("gnosis_addr");
       const dex = localStorage.getItem("dex");
-      if (gnosis_addr && dex) {
-        const module_address = await createModule(props.web3auth, gnosis_addr, dex);
-        if (module_address !== null && typeof module_address === "string") {
-          localStorage.setItem("gnosis_module", module_address);
-          setFlag(2);
+      const signature = localStorage.getItem("signature");
+      const instance_id = localStorage.getItem("instance_id");
+      if (props.account && instance_id && signature) {
+        const instance = await getInstance(props.account, instance_id, signature);
+        if (gnosis_addr && dex) {
+          const module_address = await createModule(props.web3auth, gnosis_addr, instance?.result?.instance_public_key, dex);
+          if (module_address !== null && typeof module_address === "string") {
+            localStorage.setItem("gnosis_module", module_address);
+            setFlag(2);
+          }
         }
       }
     }
@@ -57,16 +71,17 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
 
   const handleNext = async () => {
     const signature = localStorage.getItem("signature");
-    const pair = localStorage.getItem("pair");
-    const dex = localStorage.getItem("dex");
-    const safe_address = localStorage.getItem("gnosis_addr");
     const trade_module = localStorage.getItem("gnosis_module");
-    const strategy = localStorage.getItem("strategy");
-    if (props.account && signature && pair && dex && safe_address && trade_module && strategy) {
-      const instance = await createInstance(props?.account, signature, pair, dex, safe_address, trade_module, "kava", strategy, "y", "y", "y", "y", "1");
-      if (instance.result && props.setProfileStatus) {
-        props.setProfileStatus(3);
-      }
+    const c_strategy = localStorage.getItem("strategy");
+    const c_setting1 = localStorage.getItem("setting1");
+    const c_setting2 = localStorage.getItem("setting2");
+    const c_setting3 = localStorage.getItem("setting3");
+    const c_setting4 = localStorage.getItem("setting4");
+    const c_setting5 = localStorage.getItem("setting5");
+    const instance_id = localStorage.getItem("instance_id");
+    if (props.account && props.setProfileStatus && signature && instance_id && trade_module && c_strategy && c_setting1 && c_setting2 && c_setting3 && c_setting4 && c_setting5) {
+      await editInstance(props?.account, instance_id, signature, trade_module, c_strategy, c_setting1, c_setting2, c_setting3, c_setting4, c_setting5);
+      props?.setProfileStatus(3);
     }
   }
 

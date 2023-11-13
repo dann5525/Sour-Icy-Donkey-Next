@@ -56,7 +56,7 @@ export const createProfile = async (address: string, name: string, email: string
     }
 }
 
-export const createInstance = async (address: string, signature: string, owner: string, pair: string, dex: string,
+export const createInstance = async (address: string, signature: string, pair: string, dex: string,
     safe_address: string, trade_module: string, chain: string,
     strategy: string, setting1: string, setting2: string,
     setting3: string, setting4: string, setting5: string): Promise<{ result: any }> => {
@@ -96,12 +96,12 @@ export const getInstance = async (address: string, id: string, signature: string
     }
 }
 
-export const editInstance = async (address: string, id: string, signature: string, strategy: string, setting1: string, setting2: string, setting3: string, setting4: string, setting5: string): Promise<string> => {
+export const editInstance = async (address: string, id: string, signature: string, trade_module: string, strategy: string, setting1: string, setting2: string, setting3: string, setting4: string, setting5: string): Promise<{result: string}> => {
     try {
-        const response = await fetch(`http://localhost:3001/edit_instance?account=${address}&&instance_id=${id}&&signature=${signature}&&strategy=${strategy}&&setting1=${setting1}&&setting2=${setting2}&&setting3=${setting3}&&setting4=${setting4}&&setting5=${setting5}`);
+        const response = await fetch(`http://localhost:3001/edit_instance?account=${address}&&instance_id=${id}&&signature=${signature}&&trade_module=${trade_module}&&strategy=${strategy}&&setting1=${setting1}&&setting2=${setting2}&&setting3=${setting3}&&setting4=${setting4}&&setting5=${setting5}`);
         const data = await response.json();
-        return data;
+        return {result: data.message};
     } catch (error) {
-        return '';
+        return {result: ''};
     }
 }

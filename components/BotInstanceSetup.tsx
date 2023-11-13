@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { strategies, settings1, settings2, settings3, settings4, settings5 } from '../config/constants';
+import { strategies, settings3, settings4 } from '../config/constants';
 import { editInstance } from '../config/apis';
 import { Alert, Snackbar, Stack, Switch, TextField, Typography, styled } from '@mui/material';
 
@@ -80,10 +80,11 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
 
   const saveInstance = async () => {
     const instance_id = localStorage.getItem("instance_id");
+    const trade_module = localStorage.getItem("gnosis_module");
     const signature = localStorage.getItem("signature");
-    if (props.account && instance_id && signature) {
+    if (props.account && instance_id && signature && trade_module) {
       try {
-        const res = await editInstance(props?.account, instance_id, signature, strategy, setting1, setting2, setting3, setting4, setting5.toString());
+        const res = await editInstance(props?.account, instance_id, signature, trade_module, strategy, setting1, setting2, setting3, setting4, setting5.toString());
         localStorage.setItem("strategy", strategy);
         localStorage.setItem("setting1", setting1);
         localStorage.setItem("setting2", setting2);

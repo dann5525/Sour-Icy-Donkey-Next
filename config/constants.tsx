@@ -19,27 +19,12 @@ export const strategies = [
     {name: "Stratgey C", value:"c"},
 ];
 
-export const settings1 = [
-    {name: "YES", value:"y"},
-    {name: "NO", value:"n"},
-];
-
-export const settings2 = [
-    {name: "YES", value:"y"},
-    {name: "NO", value:"n"},
-];
-
 export const settings3 = [
     {name: "YES", value:"y"},
     {name: "NO", value:"n"},
 ];
 
 export const settings4 = [
-    {name: "YES", value:"y"},
-    {name: "NO", value:"n"},
-];
-
-export const settings5 = [
     {name: "YES", value:"y"},
     {name: "NO", value:"n"},
 ];
