@@ -144,7 +144,6 @@ export const tokenBalance = async (web3auth: Web3Auth, token_address: string, sa
         const tokenContract = new ethers.Contract(token_address, JSON.parse(JSON.stringify(erc20ABI)), signer);
         const balance = await tokenContract.balanceOf(safe_address);
         const decimal = await tokenContract.decimals();
-        console.log(decimal);
         return Number(balance) / 10 ** Number(decimal);
     }
     return 0;
@@ -158,7 +157,6 @@ export const transferToken = async (web3auth: Web3Auth, tokenAddr: string, toAdd
         const account = await signer.getAddress();
         const tokenContract = new ethers.Contract(tokenAddr, JSON.parse(JSON.stringify(erc20ABI)), signer);
         const decimal = await tokenContract.decimals();
-        console.log(decimal);
         const tAmount = ethers.parseUnits(amount.toString(), Number(decimal));
         if (flag) {
             const transferTx = await tokenContract.transferFrom(account, toAddr, tAmount);

@@ -52,6 +52,7 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
 
 const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
   const [strategy, setStrategy] = useState("");
+
   const [setting1, setSetting1] = useState("");
   const [setting2, setSetting2] = useState("");
   const [setting3, setSetting3] = useState("");

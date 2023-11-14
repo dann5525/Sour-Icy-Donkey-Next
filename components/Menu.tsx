@@ -36,9 +36,11 @@ const Menu: React.FC<MenuProps> = (props) => {
     <>
       <div className={`menue-container menue-root-class-name`}>
         <div className="menue-container1">
-          <button type="button" className="menue-btn-dashboard button">
-            Dashboard
-          </button>
+          <Link href="/">
+            <button type="button" className="menue-btn-dashboard button">
+              Dashboard
+            </button>
+          </Link>
           <button type="button" className="menue-btn-services button">
             Services
           </button>
@@ -48,7 +50,7 @@ const Menu: React.FC<MenuProps> = (props) => {
         </div>
         <div className="menue-container2">
           <Link href="/profile">
-            <button type="button" className="menue-btn-profile button" style={{ cursor:"pointer" }}>
+            <button type="button" className="menue-btn-profile button" style={{ cursor: "pointer" }}>
               Profile
             </button>
           </Link>

@@ -56,6 +56,16 @@ export const createProfile = async (address: string, name: string, email: string
     }
 }
 
+export const editProfile = async (address: string, signature: string, name: string, email: string, telegram: string): Promise<{ result: string }> => {
+    try {
+        const response = await fetch(`http://localhost:3001/edit_profile?account=${address}&&signature=${signature}&&name=${name}&&email=${email}&&telegram=${telegram}`);
+        const data = await response.json();
+        return {result: data.message};
+    } catch (error) {
+        return {result: ''};
+    }
+}
+
 export const createInstance = async (address: string, signature: string, pair: string, dex: string,
     safe_address: string, trade_module: string, chain: string,
     strategy: string, setting1: string, setting2: string,

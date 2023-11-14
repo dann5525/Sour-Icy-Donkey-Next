@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { BrowserProvider, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { useEffect, useState } from "react";
 import Head from 'next/head'
 import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
