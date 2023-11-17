@@ -15,7 +15,7 @@ const ProgressBar: React.FC<ProgressBarProps> = (props) => {
         <div className="progress-bar-container01">
           <div className="progress-bar-progress1">
             <div className="progress-bar-container02">
-              {(props.flag && props.flag >= 0) && <div className="progress-bar-container03"></div>}
+              <div className="progress-bar-container03"></div>
             </div>
           </div>
           <div className="progress-bar-container04"></div>

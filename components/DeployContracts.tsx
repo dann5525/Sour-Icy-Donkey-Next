@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { deploySafeContract, createModule, allowPair } from '../config/web3';
 import { Web3Auth } from '@web3auth/modal';
 
-import { createInstance, editInstance, getInstance } from '../config/apis';
+import { createInstance, editInstance, getPublicKey, getInstanceId } from '../config/apis';
 
 interface DeployContractsProps {
   rootClassName?: string;
@@ -25,8 +25,10 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
         const dex = localStorage.getItem("dex");
         const strategy = localStorage.getItem("strategy");
         if (props.account && signature && pair && dex && strategy) {
-          const instance = await createInstance(props?.account, signature, pair, dex, gnosis_addr, "", "kava", strategy, "y", "y", "y", "y", "1");
-          if (instance.result && props.setProfileStatus) {
+          try {
+            await createInstance(props?.account, signature, pair, dex, gnosis_addr, "", "kava", strategy, "y", "y", "y", "y", "1");
+            setFlag(1);
+          } catch (err) {
             setFlag(1);
           }
         }
@@ -39,14 +41,17 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
       const gnosis_addr = localStorage.getItem("gnosis_addr");
       const dex = localStorage.getItem("dex");
       const signature = localStorage.getItem("signature");
-      const instance_id = localStorage.getItem("instance_id");
-      if (props.account && instance_id && signature) {
-        const instance = await getInstance(props.account, instance_id, signature);
-        if (gnosis_addr && dex) {
-          const module_address = await createModule(props.web3auth, gnosis_addr, instance?.result?.instance_public_key, dex);
-          if (module_address !== null && typeof module_address === "string") {
-            localStorage.setItem("gnosis_module", module_address);
-            setFlag(2);
+      if (props.account && signature) {
+        const instance_id = await getInstanceId(props.account);
+        debugger;
+        if (instance_id) {
+          const public_key = await getPublicKey(props.account, instance_id, signature);
+          if (gnosis_addr && dex) {
+            const module_address = await createModule(props.web3auth, gnosis_addr, public_key?.result?.instance_public_key, dex);
+            if (module_address !== null && typeof module_address === "string") {
+              localStorage.setItem("gnosis_module", module_address);
+              setFlag(2);
+            }
           }
         }
       }

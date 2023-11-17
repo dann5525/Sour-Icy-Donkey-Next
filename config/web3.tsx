@@ -28,13 +28,14 @@ export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | n
         const paymentToken = ethers.ZeroAddress;  // Payment token address
         const payment = 0;  // Payment amount
         const paymentReceiver = ethers.ZeroAddress;  // Payment receiver address
+        const nonce = await signer.getNonce();
         // Generate setup data for Gnosis Safe
         const setupData = safeMasterCopy.interface.encodeFunctionData('setup', [
             owners, threshold, to, data, fallbackHandler, paymentToken, payment, paymentReceiver
         ]);
 
         // Create Gnosis Safe Proxy and setup
-        const createSafeTx = await proxyFactory.createProxyWithNonce(contractAddresses.safeMasterCopyAddress, setupData, 11);
+        const createSafeTx = await proxyFactory.createProxyWithNonce(contractAddresses.safeMasterCopyAddress, setupData, Number(nonce));
 
         // Wait for the transaction to be mined
         const receipt = await createSafeTx.wait();
@@ -54,7 +55,6 @@ export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, in
 
         // Contract instances
         const uupsDexFactory = new ethers.Contract(contractAddresses.uupsDEXModuleFactory, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
-
         const createModuleTx = await uupsDexFactory.createModule(gnosisAddress, instance_public_key, dexAddress);
 
         // Wait for the transaction
@@ -127,6 +127,7 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         await sendExcuteTx2.wait();
         const allowTradeTx = await uupsDexFactoryContract.allowTradeOf(addresses);
         // Wait for the transaction
+        
         const receipt = await allowTradeTx.wait();
 
         // console.log(receipt);
