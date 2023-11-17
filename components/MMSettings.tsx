@@ -6,7 +6,7 @@ import { dexs, pairs, strategies } from '../config/constants'
 interface MMSettingsProps {
   rootClassName?: string;
   account?: string;
-  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const MMSettings: React.FC<MMSettingsProps> = (props) => {

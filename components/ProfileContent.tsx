@@ -27,8 +27,8 @@ const ProfileContent: React.FC<ProfileContentProps> = (props) => {
                 localStorage.setItem("telegram", tid);
                 setMessage(res?.result);
                 setSopen(true);
-            } catch (err: any) {
-                setMessage(err.message);
+            } catch (err) {
+                console.log(err);
             }
         }
     }

@@ -3,19 +3,27 @@ import { ethers } from 'ethers';
 import { Web3Auth } from "@web3auth/modal";
 import PropTypes from 'prop-types'
 
-import { contractAddresses, pairs } from "../config/constants";
+import { pairs } from "../config/constants";
 import { erc20ABI } from '../abis/erc20';
-import { masterCopyABI } from '../abis/masterCopy';
 
 interface TransferFundsProps {
   rootClassName?: string;
   account?: string;
-  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<number>>;
   web3auth?: Web3Auth | null;
 }
 
+interface TokenPair {
+  index: number;
+  name: string;
+  value: string;
+  symbols: Array<string>;
+  addresses: Array<string>;
+  logoURLs: Array<string>;
+}
+
 const TransferFunds: React.FC<TransferFundsProps> = (props) => {
-  const [tokenPair, setTokenPair] = useState<any | null>(null);
+  const [tokenPair, setTokenPair] = useState<TokenPair | null>(null);
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
   const [balanceA, setBalanceA] = useState(0);
@@ -39,7 +47,7 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
         const account = await signer.getAddress();
         if (gnosis_addr) {
           if (flag === 0) {
-            if (balanceA > 0 && amountA <= balanceA) {
+            if (balanceA > 0 && amountA <= balanceA && tokenPair) {
               const tokenAContract = new ethers.Contract(tokenPair["addresses"][0], JSON.parse(JSON.stringify(erc20ABI)), signer);
               const amount = ethers.parseUnits(amountA.toString(), 18);
               await tokenAContract.transfer(gnosis_addr, amount);
@@ -47,7 +55,7 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
               setBalanceA(Number(balA) / 10 ** 18);
             }
           } else if (flag === 1) {
-            if (balanceB > 0 && amountB <= balanceB) {
+            if (balanceB > 0 && amountB <= balanceB && tokenPair) {
               const tokenBContract = new ethers.Contract(tokenPair["addresses"][1], JSON.parse(JSON.stringify(erc20ABI)), signer);
               const amount = ethers.parseUnits(amountB.toString(), 18);
               await tokenBContract.transfer(gnosis_addr, amount);
@@ -90,7 +98,7 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
     }
 
     init();
-  }, []);
+  }, [props.web3auth]);
 
 
   return (

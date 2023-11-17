@@ -7,8 +7,6 @@ import { masterCopyABI } from "../abis/masterCopy";
 import { uupsDEXModuleFactoryABI } from "../abis/uupsDexFactory";
 import { erc20ABI } from "../abis/erc20";
 
-import RPC from "../pages/api/web3RPC"; // for using web3.js
-
 export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | null> => {
     const web3authProvider = await web3auth.connect();
     if (web3authProvider) {

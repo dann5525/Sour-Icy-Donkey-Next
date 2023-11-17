@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import { Web3Auth } from '@web3auth/modal';
-
-import PropTypes from 'prop-types'
 import BotInstanceData from './BotInstanceData'
 import BotInstanceSetUp from './BotInstanceSetup'
 

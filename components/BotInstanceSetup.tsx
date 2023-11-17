@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-
 import { strategies, settings3, settings4 } from '../config/constants';
 import { editInstance } from '../config/apis';
 import { Alert, Snackbar, Stack, Switch, TextField, Typography, styled } from '@mui/material';
@@ -94,8 +93,8 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
         localStorage.setItem("setting5", setting5.toString());
         setMessage(res?.result);
         setSopen(true);
-      } catch (err: any) {
-        setMessage(err.message);
+      } catch (err) {
+        console.log(err);
       }
     }
   }
@@ -124,7 +123,7 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
             <span className="bot-instance-set-up-text">Strategy</span>
             <select className="bot-instance-set-up-select-exchange" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStrategy(e.target.value)}>
               {strategies.map((item) => (
-                (item.value === strategy) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+                (item.value === strategy) ? <option key={item.value} value={item.value} selected>{item.name}</option> : <option key={item.value} value={item.value}>{item.name}</option>
               ))}
             </select>
           </div>
@@ -156,7 +155,7 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
             </span>
             <select className="bot-instance-set-up-select-exchange3" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting3(e.target.value)}>
               {settings3.map((item) => (
-                (item.value === setting3) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+                (item.value === setting3) ? <option key={item.value} value={item.value} selected>{item.name}</option> : <option key={item.value} value={item.value}>{item.name}</option>
               ))}
             </select>
           </div>
@@ -166,7 +165,7 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
             </span>
             <select className="bot-instance-set-up-select-exchange4" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSetting4(e.target.value)}>
               {settings4.map((item) => (
-                (item.value === setting4) ? <option value={item.value} selected>{item.name}</option> : <option value={item.value}>{item.name}</option>
+                (item.value === setting4) ? <option key={item.value} value={item.value} selected>{item.name}</option> : <option key={item.value} value={item.value}>{item.name}</option>
               ))}
             </select>
           </div>

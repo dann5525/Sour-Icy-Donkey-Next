@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-shadow */
 import { ethers } from 'ethers';
 import { useEffect, useState } from "react";
 import Head from 'next/head'
-import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
+import { CHAIN_NAMESPACES } from "@web3auth/base";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { Web3Auth } from "@web3auth/modal";
 import { TorusWalletAdapter } from "@web3auth/torus-evm-adapter";
-// import RPC from ".api/ethersRPC"; // for using ethers.js
+
 // Plugins
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 // Adapters
@@ -32,8 +29,7 @@ const clientId = "BEglQSgt4cUWcj6SKRdu5QkOXTsePmMcusG5EAoyjyOYKlVRjIF1iCNnMOTfpz
 
 function App() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
-  const [torusPlugin, setTorusPlugin] = useState<TorusWalletConnectorPlugin | null>(null);
-  const [provider, setProvider] = useState<IProvider | null>(null);
+  // const [torusPlugin, setTorusPlugin] = useState<TorusWalletConnectorPlugin | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [account, setAccount] = useState("");
   const [profileStatus, setProfileStatus] = useState(0);
@@ -46,7 +42,6 @@ function App() {
 
     try {
       const web3authProvider = await web3auth.connect();
-      setProvider(web3authProvider);
       if (web3authProvider !== null) {
         const active_provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await active_provider.getSigner();
@@ -68,7 +63,6 @@ function App() {
                 localStorage.setItem("name", profileRes.result.profile.name);
                 localStorage.setItem("telegram", profileRes.result.profile.telegram);
                 const instance_id = await getInstanceId(active_account);
-                // console.log(instance_id);
                 if (instance_id) {
                   const instance = await getInstance(active_account, instance_id, signature);
                   localStorage.setItem("instance_id", instance_id);
@@ -124,7 +118,6 @@ function App() {
       return;
     }
     await web3auth.logout();
-    setProvider(null);
     setLoggedIn(false);
     setProfileStatus(0);
     localStorage.clear();
@@ -201,7 +194,7 @@ function App() {
             enableLogging: true,
           },
         });
-        setTorusPlugin(torusPlugin);
+        // setTorusPlugin(torusPlugin);
         await web3auth.addPlugin(torusPlugin);
 
         // read more about adapters here: https://web3auth.io/docs/sdk/web/adapters/

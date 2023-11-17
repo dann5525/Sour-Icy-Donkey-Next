@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from 'next/head'
-import { CHAIN_NAMESPACES, IProvider } from "@web3auth/base";
+import { CHAIN_NAMESPACES } from "@web3auth/base";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { Web3Auth } from "@web3auth/modal";
 import { TorusWalletAdapter } from "@web3auth/torus-evm-adapter";
@@ -23,8 +23,6 @@ const Profile = () => {
     const router = useRouter();
 
     const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
-    const [torusPlugin, setTorusPlugin] = useState<TorusWalletConnectorPlugin | null>(null);
-    const [provider, setProvider] = useState<IProvider | null>(null);
     const [account, setAccount] = useState("");
 
     const logout = async () => {
@@ -32,7 +30,6 @@ const Profile = () => {
             return;
         }
         await web3auth.logout();
-        setProvider(null);
         localStorage.clear();
         router.push('/');
     };
@@ -84,7 +81,6 @@ const Profile = () => {
                         enableLogging: true,
                     },
                 });
-                setTorusPlugin(torusPlugin);
                 await web3auth.addPlugin(torusPlugin);
 
                 // read more about adapters here: https://web3auth.io/docs/sdk/web/adapters/
@@ -161,7 +157,7 @@ const Profile = () => {
         } else {
             router.push('/');
         }
-    }, []);
+    }, [router]);
     return (
         <>
             <div className="profile-container">

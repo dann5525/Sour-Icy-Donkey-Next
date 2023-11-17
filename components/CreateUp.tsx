@@ -2,17 +2,20 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { createProfile, getProfile } from '../config/apis';
+import { Alert, Snackbar } from '@mui/material';
 
 interface CreateUPProps {
   rootClassName?: string;
   account?: string;
-  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const CreateUP: React.FC<CreateUPProps> = (props) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telegram, setTelegram] = useState("");
+  const [message, setMessage] = useState("");
+  const [sOpen, setSOpen] = useState(false);
 
   const handleName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -26,14 +29,21 @@ const CreateUP: React.FC<CreateUPProps> = (props) => {
     setTelegram(event.target.value);
   }
 
+  const handleSClose = () => {
+    setSOpen(false);
+  }
+
 
   const handleCreate = async () => {
     if (name?.trim().length === 0) {
-
+      setMessage("Wrong Name");
+      setSOpen(true);
     } else if (email?.trim().length === 0) {
-
+      setMessage("Wrong Email");
+      setSOpen(true);
     } else if (telegram?.trim().length === 0) {
-
+      setMessage("Wrong Telegram ID");
+      setSOpen(true);
     } else {
       if (props?.account) {
         const userinfo = await createProfile(props?.account, name, email, telegram);
@@ -93,6 +103,11 @@ const CreateUP: React.FC<CreateUPProps> = (props) => {
           </div>
         </div>
       </div>
+      <Snackbar open={sOpen} autoHideDuration={3000} onClose={handleSClose}>
+        <Alert onClose={handleSClose} severity="error" sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
       <style jsx>
         {`
           .create-up-container {

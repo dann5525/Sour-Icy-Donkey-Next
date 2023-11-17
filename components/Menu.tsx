@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Typography, Button, Modal, TextField, Snackbar, Alert } from '@mui/material';
+import { Box, Button, Modal } from '@mui/material';
 import Link from 'next/link';
 
 interface MenuProps {
@@ -8,7 +8,7 @@ interface MenuProps {
 }
 
 const style = {
-  position: 'absolute' as 'absolute',
+  position: 'absolute' as const,
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',

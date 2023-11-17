@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 import { deploySafeContract, createModule, allowPair } from '../config/web3';
 import { Web3Auth } from '@web3auth/modal';
 
-import { createInstance, editInstance, getPublicKey, getInstanceId } from '../config/apis';
+import { createInstance, editInstance, getPublicKey, getInstanceId, getInstance } from '../config/apis';
 
 interface DeployContractsProps {
   rootClassName?: string;
   account?: string;
-  setProfileStatus?: React.Dispatch<React.SetStateAction<any>>;
+  setProfileStatus?: React.Dispatch<React.SetStateAction<number>>;
   web3auth?: Web3Auth | null;
 }
 
@@ -27,6 +27,11 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
         if (props.account && signature && pair && dex && strategy) {
           try {
             await createInstance(props?.account, signature, pair, dex, gnosis_addr, "", "kava", strategy, "y", "y", "y", "y", "1");
+            localStorage.setItem("setting1", "y");
+            localStorage.setItem("setting2", "y");
+            localStorage.setItem("setting3", "y");
+            localStorage.setItem("setting4", "y");
+            localStorage.setItem("setting5", "1");
             setFlag(1);
           } catch (err) {
             setFlag(1);
@@ -43,13 +48,16 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
       const signature = localStorage.getItem("signature");
       if (props.account && signature) {
         const instance_id = await getInstanceId(props.account);
-        debugger;
         if (instance_id) {
           const public_key = await getPublicKey(props.account, instance_id, signature);
           if (gnosis_addr && dex) {
             const module_address = await createModule(props.web3auth, gnosis_addr, public_key?.result?.instance_public_key, dex);
             if (module_address !== null && typeof module_address === "string") {
               localStorage.setItem("gnosis_module", module_address);
+              const instance = await getInstance(props?.account, instance_id, signature);
+              await editInstance(props?.account, instance_id, signature, module_address,
+                instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
+                instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5);
               setFlag(2);
             }
           }
@@ -75,17 +83,10 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
   }
 
   const handleNext = async () => {
-    const signature = localStorage.getItem("signature");
-    const trade_module = localStorage.getItem("gnosis_module");
-    const c_strategy = localStorage.getItem("strategy");
-    const c_setting1 = localStorage.getItem("setting1");
-    const c_setting2 = localStorage.getItem("setting2");
-    const c_setting3 = localStorage.getItem("setting3");
-    const c_setting4 = localStorage.getItem("setting4");
-    const c_setting5 = localStorage.getItem("setting5");
-    const instance_id = localStorage.getItem("instance_id");
-    if (props.account && props.setProfileStatus && signature && instance_id && trade_module && c_strategy && c_setting1 && c_setting2 && c_setting3 && c_setting4 && c_setting5) {
-      await editInstance(props?.account, instance_id, signature, trade_module, c_strategy, c_setting1, c_setting2, c_setting3, c_setting4, c_setting5);
+    if (props.account && props.setProfileStatus) {
+      const instance_id = await getInstanceId(props.account);
+      if (instance_id)
+        localStorage.setItem("instance_id", instance_id);
       props?.setProfileStatus(3);
     }
   }
