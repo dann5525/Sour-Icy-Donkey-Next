@@ -5,6 +5,13 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
+  exportPathMap: async function () {
+    return {
+      '/': { page: '/' },
+      '/profile': { page: '/profile' },
+      // Add more custom routes here
+    };
+  },
   distDir: 'out',
   // swcMinify: true,
 }
