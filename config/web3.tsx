@@ -86,12 +86,15 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const uupsDexFactoryContract = new ethers.Contract(contractAddresses.uupsDEXModuleFactory, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
 
         // Amount to approve (in wei)
-        const amountToApprove = ethers.parseUnits("100000", 18);  // Replace 18 with the token's decimals if needed
+        const decimal1 = await tokenAContract.decimals();
+        const decimal2 = await tokenBContract.decimals();
+        const amountToApprove1 = ethers.parseUnits("100000", decimal1);
+        const amountToApprove2 = ethers.parseUnits("100000", decimal2);
 
         // Prepare function call data
         const enableModuleData = safeContract.interface.encodeFunctionData('enableModule', [module_address]);
-        const dataA = tokenAContract.interface.encodeFunctionData('approve', [account, amountToApprove]);
-        const dataB = tokenBContract.interface.encodeFunctionData('approve', [account, amountToApprove]);
+        const dataA = tokenAContract.interface.encodeFunctionData('approve', [account, amountToApprove1]);
+        const dataB = tokenBContract.interface.encodeFunctionData('approve', [account, amountToApprove2]);
 
         // Execute Transaction details
         const toEnable = safe_address;
@@ -135,13 +138,13 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
     }
 }
 
-export const tokenBalance = async (web3auth: Web3Auth, token_address: string, safe_address: string): Promise<number> => {
+export const tokenBalance = async (web3auth: Web3Auth, token_address: string, holding_address: string): Promise<number> => {
     const web3authProvider = await web3auth.connect();
     if (web3authProvider) {
         const provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await provider.getSigner();
         const tokenContract = new ethers.Contract(token_address, JSON.parse(JSON.stringify(erc20ABI)), signer);
-        const balance = await tokenContract.balanceOf(safe_address);
+        const balance = await tokenContract.balanceOf(holding_address);
         const decimal = await tokenContract.decimals();
         return Number(balance) / 10 ** Number(decimal);
     }
@@ -158,7 +161,7 @@ export const transferToken = async (web3auth: Web3Auth, tokenAddr: string, toAdd
         const decimal = await tokenContract.decimals();
         const tAmount = ethers.parseUnits(amount.toString(), Number(decimal));
         if (flag) {
-            const transferTx = await tokenContract.transferFrom(account, toAddr, tAmount);
+            const transferTx = await tokenContract.transfer(toAddr, tAmount);
             await transferTx.wait();
         }
         else {

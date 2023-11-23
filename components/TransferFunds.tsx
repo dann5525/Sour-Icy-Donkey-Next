@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import { pairs } from "../config/constants";
 import { erc20ABI } from '../abis/erc20';
+import { tokenBalance } from '../config/web3';
 
 interface TransferFundsProps {
   rootClassName?: string;
@@ -80,20 +81,11 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
         return item.value === pair;
       });
       setTokenPair(pair_item[0]);
-      if (props.web3auth) {
-        const web3authProvider = await props.web3auth.connect();
-        if (web3authProvider) {
-          const provider = new ethers.BrowserProvider(web3authProvider);
-          const signer = await provider.getSigner();
-          const account = await signer.getAddress();
-          const tokenAContract = new ethers.Contract(pair_item[0]["addresses"][0], JSON.parse(JSON.stringify(erc20ABI)), signer);
-          const tokenBContract = new ethers.Contract(pair_item[0]["addresses"][1], JSON.parse(JSON.stringify(erc20ABI)), signer);
-
-          const balA = await tokenAContract.balanceOf(account);
-          const balB = await tokenBContract.balanceOf(account);
-          setBalanceA(Number(balA) / 10 ** 18);
-          setBalanceB(Number(balB) / 10 ** 18);
-        }
+      if (props.web3auth && props.account) {
+        const balA = await tokenBalance(props.web3auth, pair_item[0]["addresses"][0], props.account);
+        const balB = await tokenBalance(props.web3auth, pair_item[0]["addresses"][1], props.account);
+        setBalanceA(Number(balA) / 10 ** 18);
+        setBalanceB(Number(balB) / 10 ** 18);
       }
     }
 
