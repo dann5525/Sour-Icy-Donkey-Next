@@ -23,7 +23,7 @@ import BotInstance from '../components/BotInstance';
 import Menu from '../components/Menu';
 
 
-import { getChallenge, userAuthenticate, getProfile, getInstanceId, getInstance } from "../config/apis";
+import { getWalletChallenge, userAuthenticate, getUserProfile, getInstanceId, getSafeInstance } from "../config/apis";
 
 const clientId = "BEglQSgt4cUWcj6SKRdu5QkOXTsePmMcusG5EAoyjyOYKlVRjIF1iCNnMOTfpzCiunHRrMui8TIwQPXdkQ8Yxuk"; // get from https://dashboard.web3auth.io
 
@@ -48,7 +48,7 @@ function App() {
         const active_account = await signer.getAddress();
         setAccount(active_account);
         localStorage.setItem("account", active_account);
-        const res = await getChallenge(active_account);
+        const res = await getWalletChallenge(active_account);
         if (res.result !== null) {
           const signature = await signMessage(res.result.challenge);
           if (signature) {
@@ -56,7 +56,7 @@ function App() {
             if (authenticate.result) {
               localStorage.setItem('signature', signature);
               localStorage.setItem('expire_time', res.result.expire_date);
-              const profileRes = await getProfile(active_account, signature);
+              const profileRes = await getUserProfile(active_account, signature);
               if (profileRes.result.profile) {
                 localStorage.setItem("user_id", profileRes.result.profile._id);
                 localStorage.setItem("email", profileRes.result.profile.email);
@@ -64,19 +64,24 @@ function App() {
                 localStorage.setItem("telegram", profileRes.result.profile.telegram);
                 const instance_id = await getInstanceId(active_account);
                 if (instance_id) {
-                  const instance = await getInstance(active_account, instance_id, signature);
+                  const instance = await getSafeInstance(active_account, instance_id, signature);
                   localStorage.setItem("instance_id", instance_id);
                   localStorage.setItem("dex", instance?.result?.dex);
                   localStorage.setItem("pair", instance?.result?.pair);
                   localStorage.setItem("gnosis_addr", instance?.result?.safe_address);
-                  localStorage.setItem("gnosis_module", instance?.result?.trade_module);
                   localStorage.setItem("strategy", instance?.result?.strategy);
                   localStorage.setItem("setting1", instance?.result?.setting_1);
                   localStorage.setItem("setting2", instance?.result?.setting_2);
                   localStorage.setItem("setting3", instance?.result?.setting_3);
                   localStorage.setItem("setting4", instance?.result?.setting_4);
                   localStorage.setItem("setting5", instance?.result?.setting_5);
-                  setProfileStatus(4);
+                  if (instance?.result?.trade_module === "") {
+                    setProfileStatus(2);
+                  } else {
+                    localStorage.setItem("gnosis_module", instance?.result?.trade_module);
+                    localStorage.setItem("allowed", "1");
+                    setProfileStatus(4);
+                  }
                 } else {
                   localStorage.removeItem("instance_id");
                   localStorage.removeItem("gnosis_addr");
@@ -272,7 +277,9 @@ function App() {
                 const dex = localStorage.getItem("dex");
                 if (dex) {
                   const instance_id = localStorage.getItem("instance_id");
-                  if (instance_id) {
+                  const gnosis_module = localStorage.getItem("gnosis_module");
+                  const allowed = localStorage.getItem("allowed");
+                  if (instance_id && gnosis_module && allowed) {
                     setProfileStatus(4);
                   } else {
                     setProfileStatus(2);

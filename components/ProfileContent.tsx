@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { editProfile } from '../config/apis';
+import { editUserProfile } from '../config/apis';
 import { Alert, Snackbar } from '@mui/material';
 
 interface ProfileContentProps {
@@ -21,7 +21,7 @@ const ProfileContent: React.FC<ProfileContentProps> = (props) => {
         const signature = localStorage.getItem("signature");
         if (props?.account && signature) {
             try {
-                const res = await editProfile(props?.account, signature, uname, mail, tid);
+                const res = await editUserProfile(props?.account, signature, uname, mail, tid);
                 localStorage.setItem("name", uname);
                 localStorage.setItem("email", mail);
                 localStorage.setItem("telegram", tid);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { createProfile, getProfile } from '../config/apis';
+import { createUserProfile, getUserProfile } from '../config/apis';
 import { Alert, Snackbar } from '@mui/material';
 
 interface CreateUPProps {
@@ -46,11 +46,11 @@ const CreateUP: React.FC<CreateUPProps> = (props) => {
       setSOpen(true);
     } else {
       if (props?.account) {
-        const userinfo = await createProfile(props?.account, name, email, telegram);
+        const userinfo = await createUserProfile(props?.account, name, email, telegram);
         if (userinfo) {
           const signature = localStorage.getItem("signature");
           if (signature) {
-            const profileRes = await getProfile(props?.account, signature);
+            const profileRes = await getUserProfile(props?.account, signature);
             if (profileRes.result) {
               localStorage.setItem("user_id", profileRes.result.profile._id);
               localStorage.setItem("email", profileRes.result.profile.email);

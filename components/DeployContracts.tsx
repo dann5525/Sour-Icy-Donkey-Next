@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { deploySafeContract, createModule, allowPair } from '../config/web3';
 import { Web3Auth } from '@web3auth/modal';
 
-import { createInstance, editInstance, getPublicKey, getInstanceId, getInstance } from '../config/apis';
+import { createSafeInstance, editSafeInstance, getSafePublicKey, getInstanceId, getSafeInstance } from '../config/apis';
 
 interface DeployContractsProps {
   rootClassName?: string;
@@ -26,7 +26,7 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
         const strategy = localStorage.getItem("strategy");
         if (props.account && signature && pair && dex && strategy) {
           try {
-            await createInstance(props?.account, signature, pair, dex, gnosis_addr, "", "kava", strategy, "y", "y", "y", "y", "1");
+            await createSafeInstance(props?.account, signature, pair, dex, gnosis_addr, "", "kava", strategy, "y", "y", "y", "y", "1");
             localStorage.setItem("setting1", "y");
             localStorage.setItem("setting2", "y");
             localStorage.setItem("setting3", "y");
@@ -49,13 +49,13 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
       if (props.account && signature) {
         const instance_id = await getInstanceId(props.account);
         if (instance_id) {
-          const public_key = await getPublicKey(props.account, instance_id, signature);
+          const public_key = await getSafePublicKey(props.account, instance_id, signature);
           if (gnosis_addr && dex) {
             const module_address = await createModule(props.web3auth, gnosis_addr, public_key?.result?.instance_public_key, dex);
             if (module_address !== null && typeof module_address === "string") {
               localStorage.setItem("gnosis_module", module_address);
-              const instance = await getInstance(props?.account, instance_id, signature);
-              await editInstance(props?.account, instance_id, signature, module_address,
+              const instance = await getSafeInstance(props?.account, instance_id, signature);
+              await editSafeInstance(props?.account, instance_id, signature, module_address,
                 instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
                 instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5);
               setFlag(2);
