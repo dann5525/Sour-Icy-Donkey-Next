@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
 import { Web3Auth } from "@web3auth/modal";
 import PropTypes from 'prop-types'
 
 import { pairs } from "../config/constants";
-import { erc20ABI } from '../abis/erc20';
-import { tokenBalance } from '../config/web3';
+import { tokenBalance, transferToken } from '../config/web3';
 
 interface TransferFundsProps {
   rootClassName?: string;
@@ -38,32 +36,20 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
     setAmountB(Number(event.target.value));
   }
 
-  const transferToken = async (flag: number) => {
+  const transferTokenInit = async (flag: number) => {
     const gnosis_addr = localStorage.getItem("gnosis_addr");
-    if (props.web3auth) {
-      const web3authProvider = await props.web3auth.connect();
-      if (web3authProvider) {
-        const provider = new ethers.BrowserProvider(web3authProvider);
-        const signer = await provider.getSigner();
-        const account = await signer.getAddress();
-        if (gnosis_addr) {
-          if (flag === 0) {
-            if (balanceA > 0 && amountA <= balanceA && tokenPair) {
-              const tokenAContract = new ethers.Contract(tokenPair["addresses"][0], JSON.parse(JSON.stringify(erc20ABI)), signer);
-              const amount = ethers.parseUnits(amountA.toString(), 18);
-              await tokenAContract.transfer(gnosis_addr, amount);
-              const balA = await tokenAContract.balanceOf(account);
-              setBalanceA(Number(balA) / 10 ** 18);
-            }
-          } else if (flag === 1) {
-            if (balanceB > 0 && amountB <= balanceB && tokenPair) {
-              const tokenBContract = new ethers.Contract(tokenPair["addresses"][1], JSON.parse(JSON.stringify(erc20ABI)), signer);
-              const amount = ethers.parseUnits(amountB.toString(), 18);
-              await tokenBContract.transfer(gnosis_addr, amount);
-              const balB = await tokenBContract.balanceOf(account);
-              setBalanceB(Number(balB) / 10 ** 18);
-            }
-          }
+    if (props.web3auth && props.account && gnosis_addr) {
+      if (flag === 0) {
+        if (balanceA > 0 && amountA <= balanceA && tokenPair) {
+          await transferToken(props.web3auth, tokenPair["addresses"][0], gnosis_addr, amountA, true);
+          const balA = await tokenBalance(props.web3auth, tokenPair["addresses"][0], props.account);
+          setBalanceA(Number(balA));
+        }
+      } else if (flag === 1) {
+        if (balanceB > 0 && amountB <= balanceB && tokenPair) {
+          await transferToken(props.web3auth, tokenPair["addresses"][1], gnosis_addr, amountB, true);
+          const balB = await tokenBalance(props.web3auth, tokenPair["addresses"][1], props.account);
+          setBalanceB(Number(balB));
         }
       }
     }
@@ -84,8 +70,8 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
       if (props.web3auth && props.account) {
         const balA = await tokenBalance(props.web3auth, pair_item[0]["addresses"][0], props.account);
         const balB = await tokenBalance(props.web3auth, pair_item[0]["addresses"][1], props.account);
-        setBalanceA(Number(balA) / 10 ** 18);
-        setBalanceB(Number(balB) / 10 ** 18);
+        setBalanceA(Number(balA));
+        setBalanceB(Number(balB));
       }
     }
 
@@ -109,7 +95,7 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
               />
               <span>Balance: {balanceA}</span>
             </div>
-            <button type="button" className="transfer-funds-button button" onClick={() => transferToken(0)}>
+            <button type="button" className="transfer-funds-button button" onClick={() => transferTokenInit(0)}>
               Send
             </button>
           </div>
@@ -124,7 +110,7 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
               />
               <span>Balance: {balanceB}</span>
             </div>
-            <button type="button" className="transfer-funds-button1 button" onClick={() => transferToken(1)}>
+            <button type="button" className="transfer-funds-button1 button" onClick={() => transferTokenInit(1)}>
               Send
             </button>
           </div>

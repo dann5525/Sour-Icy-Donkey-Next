@@ -21,19 +21,19 @@ const ProgressBar: React.FC<ProgressBarProps> = (props) => {
           <div className="progress-bar-container04"></div>
           <div className="progress-bar-progress2">
             <div className="progress-bar-container05">
-              {(props.flag && props.flag >= 1) && <div className="progress-bar-container06"></div>}
+              {(props.flag && props.flag >= 1) ? <div className="progress-bar-container06"></div> : ""}
             </div>
           </div>
           <div className="progress-bar-container07"></div>
           <div className="progress-bar-progress3">
             <div className="progress-bar-container08">
-              {(props.flag && props.flag >= 2) && <div className="progress-bar-container09"></div>}
+              {(props.flag && props.flag >= 2) ? <div className="progress-bar-container09"></div>: ""}
             </div>
           </div>
           <div className="progress-bar-container10"></div>
           <div className="progress-bar-progress4">
             <div className="progress-bar-container11">
-              {(props.flag && props.flag >= 3) && <div className="progress-bar-container12"></div>}
+              {(props.flag && props.flag >= 3) ? <div className="progress-bar-container12"></div>: ""}
             </div>
           </div>
         </div>

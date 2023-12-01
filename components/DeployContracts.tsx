@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import { deploySafeContract, createModule, allowPair } from '../config/web3';
 import { Web3Auth } from '@web3auth/modal';
 
-import { createSafeInstance, editSafeInstance, getSafePublicKey, getInstanceId, getSafeInstance } from '../config/apis';
+import { createSafeInstance, editSafeInstance, getSafePublicKey, getInstanceId, getSafeInstance, createDockerContainer } from '../config/apis';
+import { Alert, Snackbar } from '@mui/material';
 
 interface DeployContractsProps {
   rootClassName?: string;
@@ -14,6 +15,12 @@ interface DeployContractsProps {
 
 const DeployContracts: React.FC<DeployContractsProps> = (props) => {
   const [flag, setFlag] = useState(0);
+  const [sopen, setSopen] = useState(false);
+  const [snackbarTxt, setSnackbarTxt] = useState("");
+
+  const handleSClose = () => {
+    setSopen(false);
+  }
 
   const deployGnosis = async () => {
     if (props.web3auth) {
@@ -67,14 +74,21 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
   }
 
   const allowGPair = async () => {
-    if (props.web3auth) {
+    if (props.web3auth && props.account) {
       const safe_address = localStorage.getItem("gnosis_addr");
       const module_address = localStorage.getItem("gnosis_module");
+      const dex = localStorage.getItem("dex");
       const pair = localStorage.getItem("pair");
 
-      if (safe_address && module_address && pair) {
-        const is_allowed = await allowPair(props.web3auth, safe_address, module_address, pair);
-        if (is_allowed) {
+      const signature = localStorage.getItem("signature");
+
+      if (safe_address && module_address && dex && pair && signature) {
+        // const is_allowed = await allowPair(props.web3auth, safe_address, module_address, dex, pair);
+        if (true) {
+          const instance_id = await getInstanceId(props.account);
+          const created_msg = await createDockerContainer(props?.account, signature, instance_id);
+          setSnackbarTxt(created_msg);
+          setSopen(true);
           localStorage.setItem("allowed", "1");
           setFlag(3);
         }
@@ -95,6 +109,7 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
     const gnosis_addr = localStorage.getItem("gnosis_addr");
     const gnosis_module = localStorage.getItem("gnosis_module");
     const pair_allowed = localStorage.getItem("allowed");
+
     if (pair_allowed)
       setFlag(3);
     else if (gnosis_module)
@@ -149,6 +164,11 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
             }
           </div>
         </div>
+        <Snackbar open={sopen} autoHideDuration={3000} onClose={handleSClose}>
+          <Alert onClose={handleSClose} severity="success" sx={{ width: '100%' }}>
+            {snackbarTxt}
+          </Alert>
+        </Snackbar>
       </div>
       <style jsx>
         {`

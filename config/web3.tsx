@@ -66,7 +66,7 @@ export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, in
     }
 }
 
-export const allowPair = async (web3auth: Web3Auth, safe_address: string, module_address: string, pair: string): Promise<boolean> => {
+export const allowPair = async (web3auth: Web3Auth, safe_address: string, module_address: string, dex_address: string, pair: string): Promise<boolean> => {
     const web3authProvider = await web3auth.connect();
     if (web3authProvider) {
         const provider = new ethers.BrowserProvider(web3authProvider);
@@ -93,8 +93,8 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
 
         // Prepare function call data
         const enableModuleData = safeContract.interface.encodeFunctionData('enableModule', [module_address]);
-        const dataA = tokenAContract.interface.encodeFunctionData('approve', [account, amountToApprove1]);
-        const dataB = tokenBContract.interface.encodeFunctionData('approve', [account, amountToApprove2]);
+        const dataA = tokenAContract.interface.encodeFunctionData('approve', [dex_address, amountToApprove1]);
+        const dataB = tokenBContract.interface.encodeFunctionData('approve', [dex_address, amountToApprove2]);
 
         // Execute Transaction details
         const toEnable = safe_address;

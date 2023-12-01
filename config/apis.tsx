@@ -139,3 +139,13 @@ export const getSafePublicKey = async (address: string, id: string, signature: s
         return { result: null }
     }
 }
+
+export const createDockerContainer = async (address: string, signature: string, instance_id: string): Promise<string> => {
+    try {
+        const response = await fetch(`/api/create_container?account=${address}&&instance_id=${instance_id}&&signature=${signature}`);
+        const msg = await response.json();
+        return msg.message;
+    } catch (error) {
+        return "Docker container is not created correctly!";
+    }
+}
