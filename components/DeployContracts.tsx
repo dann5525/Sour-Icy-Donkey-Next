@@ -83,8 +83,8 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
       const signature = localStorage.getItem("signature");
 
       if (safe_address && module_address && dex && pair && signature) {
-        // const is_allowed = await allowPair(props.web3auth, safe_address, module_address, dex, pair);
-        if (true) {
+        const is_allowed = await allowPair(props.web3auth, safe_address, module_address, dex, pair);
+        if (is_allowed) {
           const instance_id = await getInstanceId(props.account);
           const created_msg = await createDockerContainer(props?.account, signature, instance_id);
           setSnackbarTxt(created_msg);
