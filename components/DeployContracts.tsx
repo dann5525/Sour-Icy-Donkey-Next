@@ -15,12 +15,6 @@ interface DeployContractsProps {
 
 const DeployContracts: React.FC<DeployContractsProps> = (props) => {
   const [flag, setFlag] = useState(0);
-  const [sopen, setSopen] = useState(false);
-  const [snackbarTxt, setSnackbarTxt] = useState("");
-
-  const handleSClose = () => {
-    setSopen(false);
-  }
 
   const deployGnosis = async () => {
     if (props.web3auth) {
@@ -64,7 +58,7 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
               const instance = await getSafeInstance(props?.account, instance_id, signature);
               await editSafeInstance(props?.account, instance_id, signature, module_address,
                 instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
-                instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5);
+                instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5, false, false);
               setFlag(2);
             }
           }
@@ -79,16 +73,16 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
       const module_address = localStorage.getItem("gnosis_module");
       const dex = localStorage.getItem("dex");
       const pair = localStorage.getItem("pair");
-
       const signature = localStorage.getItem("signature");
 
       if (safe_address && module_address && dex && pair && signature) {
         const is_allowed = await allowPair(props.web3auth, safe_address, module_address, dex, pair);
         if (is_allowed) {
           const instance_id = await getInstanceId(props.account);
-          const created_msg = await createDockerContainer(props?.account, signature, instance_id);
-          setSnackbarTxt(created_msg);
-          setSopen(true);
+          const instance = await getSafeInstance(props?.account, instance_id, signature);
+          await editSafeInstance(props?.account, instance_id, signature, module_address,
+            instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
+            instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5, true, false);
           localStorage.setItem("allowed", "1");
           setFlag(3);
         }
@@ -164,11 +158,6 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
             }
           </div>
         </div>
-        <Snackbar open={sopen} autoHideDuration={3000} onClose={handleSClose}>
-          <Alert onClose={handleSClose} severity="success" sx={{ width: '100%' }}>
-            {snackbarTxt}
-          </Alert>
-        </Snackbar>
       </div>
       <style jsx>
         {`

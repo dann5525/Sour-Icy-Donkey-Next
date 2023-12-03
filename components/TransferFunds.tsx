@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 
 import { pairs } from "../config/constants";
 import { tokenBalance, transferToken } from '../config/web3';
+import { editSafeInstance, createDockerContainer, getInstanceId, getSafeInstance } from '../config/apis';
+import { Alert, Snackbar } from '@mui/material';
 
 interface TransferFundsProps {
   rootClassName?: string;
@@ -27,6 +29,13 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
   const [amountB, setAmountB] = useState(0);
   const [balanceA, setBalanceA] = useState(0);
   const [balanceB, setBalanceB] = useState(0);
+  const [isDeposited, setIsDeposited] = useState(false);
+  const [sopen, setSopen] = useState(false);
+  const [snackbarTxt, setSnackbarTxt] = useState("");
+
+  const handleSClose = () => {
+    setSopen(false);
+  }
 
   const handleAmountA = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmountA(Number(event.target.value));
@@ -37,27 +46,60 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
   }
 
   const transferTokenInit = async (flag: number) => {
+    const signature = localStorage.getItem("signature");
     const gnosis_addr = localStorage.getItem("gnosis_addr");
-    if (props.web3auth && props.account && gnosis_addr) {
+    if (props.web3auth && props.account && signature && gnosis_addr) {
       if (flag === 0) {
-        if (balanceA > 0 && amountA <= balanceA && tokenPair) {
+        if (balanceA > 0 && amountA > 0 && amountA <= balanceA && tokenPair) {
           await transferToken(props.web3auth, tokenPair["addresses"][0], gnosis_addr, amountA, true);
           const balA = await tokenBalance(props.web3auth, tokenPair["addresses"][0], props.account);
+          setAmountA(0);
           setBalanceA(Number(balA));
+          if (!isDeposited) {
+            setIsDeposited(true);
+          }
+        } else {
+          setSnackbarTxt("Fill the amount, please.");
+          setSopen(true);
         }
       } else if (flag === 1) {
-        if (balanceB > 0 && amountB <= balanceB && tokenPair) {
+        if (balanceB > 0 && amountB > 0 && amountB <= balanceB && tokenPair) {
           await transferToken(props.web3auth, tokenPair["addresses"][1], gnosis_addr, amountB, true);
           const balB = await tokenBalance(props.web3auth, tokenPair["addresses"][1], props.account);
+          setAmountB(0);
           setBalanceB(Number(balB));
+          if (!isDeposited) {
+            setIsDeposited(true);
+          }
+        } else {
+          setSnackbarTxt("Fill the amount, please.");
+          setSopen(true);
         }
       }
     }
   }
 
-  const handleNext = () => {
-    if (props.setProfileStatus)
-      props.setProfileStatus(4);
+  const handleNext = async () => {
+    const signature = localStorage.getItem("signature");
+    const module_address = localStorage.getItem("gnosis_module");
+    if (props.account && signature && module_address) {
+      const instance_id = await getInstanceId(props.account);
+      const created_msg = await createDockerContainer(props?.account, signature, instance_id);
+      console.log(created_msg);
+      setSnackbarTxt(created_msg);
+      setSopen(true);
+      if (created_msg !== "Start delayed, please contact customer support") {
+        const instance_id = await getInstanceId(props.account);
+        const instance = await getSafeInstance(props?.account, instance_id, signature);
+        await editSafeInstance(props?.account, instance_id, signature, module_address,
+          instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
+          instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5, true, true);
+        setTimeout(function () {
+          if (props.setProfileStatus)
+            props.setProfileStatus(4);
+        }, 3000);
+      }
+    }
   }
 
   useEffect(() => {
@@ -72,6 +114,13 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
         const balB = await tokenBalance(props.web3auth, pair_item[0]["addresses"][1], props.account);
         setBalanceA(Number(balA));
         setBalanceB(Number(balB));
+        const gnosis_addr = localStorage.getItem("gnosis_addr");
+        if (gnosis_addr) {
+          const holdingBalA = await tokenBalance(props.web3auth, pair_item[0]["addresses"][0], gnosis_addr);
+          const holdingBalB = await tokenBalance(props.web3auth, pair_item[0]["addresses"][1], gnosis_addr);
+          if (Number(holdingBalA) > 0 || Number(holdingBalB) > 0)
+            setIsDeposited(true);
+        }
       }
     }
 
@@ -115,11 +164,18 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
             </button>
           </div>
           <div className="transfer-funds-container-next">
-            <button type="button" className="transfer-funds-button2 button" onClick={handleNext}>
-              Next
-            </button>
+            {isDeposited &&
+              <button type="button" className="transfer-funds-button2 button" onClick={handleNext}>
+                Next
+              </button>
+            }
           </div>
         </div>
+        <Snackbar open={sopen} autoHideDuration={3000} onClose={handleSClose}>
+          <Alert onClose={handleSClose} severity="success" sx={{ width: '100%' }}>
+            {snackbarTxt}
+          </Alert>
+        </Snackbar>
       </div>
       <style jsx>
         {`

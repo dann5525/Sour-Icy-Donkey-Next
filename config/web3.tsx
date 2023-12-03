@@ -112,24 +112,44 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const types = ['address', 'uint256'];
         let signature = ethers.AbiCoder.defaultAbiCoder().encode(types, [account, 0]);
         signature = signature + "01";
-        // console.log(enableModuleData);
-        const sendExcuteTx0 = await safeContract.execTransaction(toEnable, value, enableModuleData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature);
-        // Wait for the transaction
-        await sendExcuteTx0.wait();
-        const sendExcuteTx1 = await safeContract.execTransaction(
-            toA, value, dataA, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
-        );
-        // Wait for the transaction
-        await sendExcuteTx1.wait();
-        const sendExcuteTx2 = await safeContract.execTransaction(
-            toB, value, dataB, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
-        );
-        // Wait for the transaction
-        await sendExcuteTx2.wait();
-        const allowTradeTx = await uupsDexFactoryContract.allowTradeOf(addresses);
-        // Wait for the transaction
         
-        const receipt = await allowTradeTx.wait();
+        try {
+            const sendExcuteTx0 = await safeContract.execTransaction(toEnable, value, enableModuleData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature);
+            // Wait for the transaction
+            await sendExcuteTx0.wait();
+
+            const sendExcuteTx1 = await safeContract.execTransaction(
+                toA, value, dataA, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx1.wait();
+            
+            const sendExcuteTx2 = await safeContract.execTransaction(
+                toB, value, dataB, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx2.wait();
+            
+            const allowTradeTx = await uupsDexFactoryContract.allowTradeOf(addresses);
+            // Wait for the transaction
+            await allowTradeTx.wait();
+        } catch (err) {
+            const sendExcuteTx1 = await safeContract.execTransaction(
+                toA, value, dataA, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx1.wait();
+            
+            const sendExcuteTx2 = await safeContract.execTransaction(
+                toB, value, dataB, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx2.wait();
+            
+            const allowTradeTx = await uupsDexFactoryContract.allowTradeOf(addresses);
+            // Wait for the transaction
+            await allowTradeTx.wait();
+        }
 
         // console.log(receipt);
         return true;

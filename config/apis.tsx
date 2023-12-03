@@ -112,9 +112,9 @@ export const createSafeInstance = async (address: string, signature: string, pai
     }
 }
 
-export const editSafeInstance = async (address: string, id: string, signature: string, trade_module: string, strategy: string, setting1: string, setting2: string, setting3: string, setting4: string, setting5: string): Promise<{ result: string }> => {
+export const editSafeInstance = async (address: string, id: string, signature: string, trade_module: string, strategy: string, setting1: string, setting2: string, setting3: string, setting4: string, setting5: string, allowed: boolean, deposited: boolean): Promise<{ result: string }> => {
     try {
-        const response = await fetch(`/api/instance?account=${address}&&instance_id=${id}&&signature=${signature}&&trade_module=${trade_module}&&strategy=${strategy}&&setting1=${setting1}&&setting2=${setting2}&&setting3=${setting3}&&setting4=${setting4}&&setting5=${setting5}`, {
+        const response = await fetch(`/api/instance?account=${address}&&instance_id=${id}&&signature=${signature}&&trade_module=${trade_module}&&strategy=${strategy}&&setting1=${setting1}&&setting2=${setting2}&&setting3=${setting3}&&setting4=${setting4}&&setting5=${setting5}&&allowed=${allowed}&&deposited=${deposited}`, {
             method: "PUT"
         });
         const data = await response.json();

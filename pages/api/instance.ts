@@ -80,8 +80,9 @@ async function editInstance(req: NextApiRequest, res: NextApiResponse) {
         // Make a request to the remote server
         const params = {
             trade_module: req.query.trade_module, strategy: req.query.strategy, setting_1: req.query.setting1, setting_2: req.query.setting2
-            , setting_3: req.query.setting3, setting_4: req.query.setting4, setting_5: req.query.setting5
+            , setting_3: req.query.setting3, setting_4: req.query.setting4, setting_5: req.query.setting5, allowed: req.query.allowed, deposited: req.query.deposited
         };
+        console.log(params);
         const response = await fetch(process.env.API_ENDPOINT+'/edit_instance/' + req.query.instance_id, {
             method: 'PUT',
             headers: {

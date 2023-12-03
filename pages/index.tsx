@@ -65,6 +65,7 @@ function App() {
                 const instance_id = await getInstanceId(active_account);
                 if (instance_id) {
                   const instance = await getSafeInstance(active_account, instance_id, signature);
+                  console.log(instance);
                   localStorage.setItem("instance_id", instance_id);
                   localStorage.setItem("dex", instance?.result?.dex);
                   localStorage.setItem("pair", instance?.result?.pair);
@@ -77,9 +78,17 @@ function App() {
                   localStorage.setItem("setting5", instance?.result?.setting_5);
                   if (instance?.result?.trade_module === "") {
                     setProfileStatus(2);
+                  } else if(instance?.result?.allowed === false) {
+                    localStorage.setItem("gnosis_module", instance?.result?.trade_module);
+                    setProfileStatus(2);
+                  } else if(instance?.result?.deposited === false) {
+                    localStorage.setItem("gnosis_module", instance?.result?.trade_module);
+                    localStorage.setItem("allowed", "1");
+                    setProfileStatus(3);
                   } else {
                     localStorage.setItem("gnosis_module", instance?.result?.trade_module);
                     localStorage.setItem("allowed", "1");
+                    localStorage.setItem("deposited", "1");
                     setProfileStatus(4);
                   }
                 } else {
@@ -276,10 +285,11 @@ function App() {
               if (user_id) {
                 const dex = localStorage.getItem("dex");
                 if (dex) {
-                  const instance_id = localStorage.getItem("instance_id");
-                  const gnosis_module = localStorage.getItem("gnosis_module");
                   const allowed = localStorage.getItem("allowed");
-                  if (instance_id && gnosis_module && allowed) {
+                  const deposited = localStorage.getItem("deposited");
+                  if (allowed) {
+                    setProfileStatus(3);
+                  } else if (deposited) {
                     setProfileStatus(4);
                   } else {
                     setProfileStatus(2);
