@@ -75,6 +75,13 @@ const DeployContracts: React.FC<DeployContractsProps> = (props) => {
       const pair = localStorage.getItem("pair");
       const signature = localStorage.getItem("signature");
 
+      // if (signature) {
+      //   const instance_id = await getInstanceId(props.account);
+      //   const instance = await getSafeInstance(props?.account, instance_id, signature);
+      //   await editSafeInstance(props?.account, instance_id, signature, "",
+      //     instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
+      //     instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5, true, false);
+      // }
       if (safe_address && module_address && dex && pair && signature) {
         const is_allowed = await allowPair(props.web3auth, safe_address, module_address, dex, pair);
         if (is_allowed) {

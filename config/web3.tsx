@@ -1,10 +1,9 @@
 import { Web3Auth } from "@web3auth/modal";
-import { ethers } from 'ethers';
-
+import { ethers } from "ethers";
 import { contractAddresses, pairs } from "./constants";
 import { proxyFactoryABI } from "../abis/proxyFactory";
 import { masterCopyABI } from "../abis/masterCopy";
-import { uupsDEXModuleFactoryABI } from "../abis/uupsDexFactory";
+import { dexModuleABI } from "../abis/dexModule";
 import { erc20ABI } from "../abis/erc20";
 
 export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | null> => {
@@ -50,17 +49,13 @@ export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, in
     if (web3authProvider) {
         const provider = new ethers.BrowserProvider(web3authProvider);
         const signer = await provider.getSigner();
+        const account = await signer.getAddress();
 
-        // Contract instances
-        const uupsDexFactory = new ethers.Contract(contractAddresses.uupsDEXModuleFactory, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
-        const createModuleTx = await uupsDexFactory.createModule(gnosisAddress, instance_public_key, dexAddress);
-
-        // Wait for the transaction
-        const receipt = await createModuleTx.wait();
-
-        const created_module = receipt.logs[0]["address"];
-
-        return created_module;
+        const response = await fetch(`http://localhost:5000/deploy?account=${account}&&dex=${dexAddress}&&safe=${gnosisAddress}`);
+        const data = await response.json();
+        console.log(data);
+        // return trade_module;
+        return data.address;
     } else {
         return null;
     }
@@ -83,7 +78,7 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const safeContract = new ethers.Contract(safe_address, JSON.parse(JSON.stringify(masterCopyABI)), signer);
         const tokenAContract = new ethers.Contract(addresses[0], JSON.parse(JSON.stringify(erc20ABI)), signer);
         const tokenBContract = new ethers.Contract(addresses[1], JSON.parse(JSON.stringify(erc20ABI)), signer);
-        const uupsDexFactoryContract = new ethers.Contract(contractAddresses.uupsDEXModuleFactory, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
+        const dexModuleContract = new ethers.Contract(module_address, JSON.parse(JSON.stringify(dexModuleABI)), signer);
 
         // Amount to approve (in wei)
         const decimal1 = await tokenAContract.decimals();
@@ -95,11 +90,13 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const enableModuleData = safeContract.interface.encodeFunctionData('enableModule', [module_address]);
         const dataA = tokenAContract.interface.encodeFunctionData('approve', [dex_address, amountToApprove1]);
         const dataB = tokenBContract.interface.encodeFunctionData('approve', [dex_address, amountToApprove2]);
+        const allowTradeOfData = dexModuleContract.interface.encodeFunctionData('allowTradeOf', [addresses]);
 
         // Execute Transaction details
         const toEnable = safe_address;
         const toA = addresses[0];
         const toB = addresses[1];
+        const toAllow = safe_address;
         const value = 0;
         const operation = 0;  // 0 for call, 1 for delegatecall
         const safeTxGas = 0;  // Estimate appropriately
@@ -112,7 +109,7 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const types = ['address', 'uint256'];
         let signature = ethers.AbiCoder.defaultAbiCoder().encode(types, [account, 0]);
         signature = signature + "01";
-        
+
         try {
             const sendExcuteTx0 = await safeContract.execTransaction(toEnable, value, enableModuleData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature);
             // Wait for the transaction
@@ -123,14 +120,16 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
             );
             // Wait for the transaction
             await sendExcuteTx1.wait();
-            
+
             const sendExcuteTx2 = await safeContract.execTransaction(
                 toB, value, dataB, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
             );
             // Wait for the transaction
             await sendExcuteTx2.wait();
             
-            const allowTradeTx = await uupsDexFactoryContract.allowTradeOf(addresses);
+            const allowTradeTx = await safeContract.execTransaction(
+                toAllow, value, allowTradeOfData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
             // Wait for the transaction
             await allowTradeTx.wait();
         } catch (err) {
@@ -139,14 +138,16 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
             );
             // Wait for the transaction
             await sendExcuteTx1.wait();
-            
+
             const sendExcuteTx2 = await safeContract.execTransaction(
                 toB, value, dataB, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
             );
             // Wait for the transaction
             await sendExcuteTx2.wait();
-            
-            const allowTradeTx = await uupsDexFactoryContract.allowTradeOf(addresses);
+
+            const allowTradeTx = await safeContract.execTransaction(
+                toAllow, value, allowTradeOfData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
             // Wait for the transaction
             await allowTradeTx.wait();
         }
