@@ -47,11 +47,7 @@ export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | n
 export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, instance_public_key: string, dexAddress: string): Promise<string | null> => {
     const web3authProvider = await web3auth.connect();
     if (web3authProvider) {
-        const provider = new ethers.BrowserProvider(web3authProvider);
-        const signer = await provider.getSigner();
-        const account = await signer.getAddress();
-
-        const response = await fetch(`http://localhost:5000/deploy?account=${account}&&dex=${dexAddress}&&safe=${gnosisAddress}`);
+        const response = await fetch(`http://localhost:5000/deploy?account=${instance_public_key}&&dex=${dexAddress}&&safe=${gnosisAddress}`);
         const data = await response.json();
         console.log(data);
         // return trade_module;
