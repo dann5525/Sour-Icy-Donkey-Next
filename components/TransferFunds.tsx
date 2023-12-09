@@ -85,7 +85,6 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
     if (props.account && signature && module_address) {
       const instance_id = await getInstanceId(props.account);
       const created_msg = await createDockerContainer(props?.account, signature, instance_id);
-      console.log(created_msg);
       setSnackbarTxt(created_msg);
       setSopen(true);
       if (created_msg !== "Start delayed, please contact customer support") {

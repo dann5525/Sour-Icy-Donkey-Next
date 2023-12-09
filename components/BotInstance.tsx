@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Web3Auth } from '@web3auth/modal';
 import BotInstanceData from './BotInstanceData'
 import BotInstanceSetUp from './BotInstanceSetup'
+import BotInstanceGasToken from './BotInstanceGasToken';
 
 interface BotInstanceProps {
   account?: string;
@@ -23,6 +24,10 @@ const BotInstance: React.FC<BotInstanceProps> = (props) => {
           <div className="bot-instance1-container4"></div>
           <BotInstanceSetUp account={props.account} ></BotInstanceSetUp>
           <div className="bot-instance1-container5"></div>
+        </div>
+        <div className="bot-instance1-container2">
+          <BotInstanceGasToken web3auth={props.web3auth} account={props.account}></BotInstanceGasToken>
+          {/* <div className="bot-instance1-container5"></div> */}
         </div>
         <div className="bot-instance1-container6"></div>
       </div>

@@ -84,7 +84,7 @@ const BotInstanceSetUp: React.FC<BotInstanceSetupProps> = (props) => {
     const signature = localStorage.getItem("signature");
     if (props.account && instance_id && signature && trade_module) {
       try {
-        const res = await editSafeInstance(props?.account, instance_id, signature, trade_module, strategy, setting1, setting2, setting3, setting4, setting5.toString());
+        const res = await editSafeInstance(props?.account, instance_id, signature, trade_module, strategy, setting1, setting2, setting3, setting4, setting5.toString(), true, true);
         localStorage.setItem("strategy", strategy);
         localStorage.setItem("setting1", setting1);
         localStorage.setItem("setting2", setting2);

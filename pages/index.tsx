@@ -287,10 +287,11 @@ function App() {
                 if (dex) {
                   const allowed = localStorage.getItem("allowed");
                   const deposited = localStorage.getItem("deposited");
-                  if (allowed) {
-                    setProfileStatus(3);
-                  } else if (deposited) {
+                  
+                  if (deposited) {
                     setProfileStatus(4);
+                  } else if(allowed) {
+                    setProfileStatus(3);
                   } else {
                     setProfileStatus(2);
                   }
