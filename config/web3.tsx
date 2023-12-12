@@ -5,6 +5,7 @@ import { proxyFactoryABI } from "../abis/proxyFactory";
 import { masterCopyABI } from "../abis/masterCopy";
 import { dexModuleABI } from "../abis/dexModule";
 import { erc20ABI } from "../abis/erc20";
+import { uupsDEXModuleFactoryABI } from "../abis/uupsDexFactory";
 
 export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | null> => {
     const web3authProvider = await web3auth.connect();
@@ -47,11 +48,22 @@ export const deploySafeContract = async (web3auth: Web3Auth): Promise<string | n
 export const createModule = async (web3auth: Web3Auth, gnosisAddress: string, instance_public_key: string, dexAddress: string): Promise<string | null> => {
     const web3authProvider = await web3auth.connect();
     if (web3authProvider) {
-        const response = await fetch(`http://localhost:5000/deploy?account=${instance_public_key}&&dex=${dexAddress}&&safe=${gnosisAddress}`);
-        const data = await response.json();
-        console.log(data);
-        // return trade_module;
-        return data.address;
+        // const response = await fetch(`http://localhost:5000/deploy?account=${instance_public_key}&&dex=${dexAddress}&&safe=${gnosisAddress}`);
+        // const data = await response.json();
+        // return data.address;
+        const provider = new ethers.BrowserProvider(web3authProvider);
+        const signer = await provider.getSigner();
+
+        // Contract instances
+        const uupsDexFactory = new ethers.Contract(contractAddresses.uupsDEXModuleFactory, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
+        const createModuleTx = await uupsDexFactory.createModule(gnosisAddress, instance_public_key, dexAddress);
+
+        // Wait for the transaction
+        const receipt = await createModuleTx.wait();
+
+        const created_module = receipt.logs[0]["address"];
+
+        return created_module;
     } else {
         return null;
     }
@@ -74,7 +86,7 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const safeContract = new ethers.Contract(safe_address, JSON.parse(JSON.stringify(masterCopyABI)), signer);
         const tokenAContract = new ethers.Contract(addresses[0], JSON.parse(JSON.stringify(erc20ABI)), signer);
         const tokenBContract = new ethers.Contract(addresses[1], JSON.parse(JSON.stringify(erc20ABI)), signer);
-        const dexModuleContract = new ethers.Contract(module_address, JSON.parse(JSON.stringify(dexModuleABI)), signer);
+        const dexModuleContract = new ethers.Contract(module_address, JSON.parse(JSON.stringify(uupsDEXModuleFactoryABI)), signer);
 
         // Amount to approve (in wei)
         const decimal1 = await tokenAContract.decimals();
