@@ -1,7 +1,7 @@
 export const contractAddresses = {
     "proxyFactoryAddress": "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
     "safeMasterCopyAddress": "0x3E5c63644E683549055b9Be8653de26E0B4CD36E",
-    "uupsDEXModuleFactory": "0x887DD1135835D1d8FF896D8AF57dD05a9F973ccc"
+    "uupsDEXModuleFactory": "0xE3A0E46a3086524559cCD3F975A6A00929E10eDb"
 }
 
 export const pairs = [
