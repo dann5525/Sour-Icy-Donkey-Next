@@ -5,7 +5,7 @@ import { CHAIN_NAMESPACES } from "@web3auth/base";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { Web3Auth } from "@web3auth/modal";
 import { TorusWalletAdapter } from "@web3auth/torus-evm-adapter";
-
+import { Box, Button, Modal, Typography } from '@mui/material';
 // Plugins
 import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 // Adapters
@@ -27,102 +27,134 @@ import { getWalletChallenge, userAuthenticate, getUserProfile, getInstanceId, ge
 
 const clientId = "BEglQSgt4cUWcj6SKRdu5QkOXTsePmMcusG5EAoyjyOYKlVRjIF1iCNnMOTfpzCiunHRrMui8TIwQPXdkQ8Yxuk"; // get from https://dashboard.web3auth.io
 
+const style = {
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: "80%",
+  maxHeight: "100%",
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  display: "flex",
+  justifyContent: "center",
+  flexDirection: "column",
+  overflow: "scroll",
+  p: 4,
+};
+
+
 function App() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   // const [torusPlugin, setTorusPlugin] = useState<TorusWalletConnectorPlugin | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [account, setAccount] = useState("");
+  const [isChecked, setIsChecked] = useState(false);
+  const [open, setOpen] = useState(false);
   const [profileStatus, setProfileStatus] = useState(0);
 
-  const login = async () => {
-    if (!web3auth) {
-      uiConsole("web3auth not initialized yet");
-      return;
-    }
+  const handleChecked = () => {
+    setIsChecked(true);
+  }
 
-    try {
-      const web3authProvider = await web3auth.connect();
-      if (web3authProvider !== null) {
-        const active_provider = new ethers.BrowserProvider(web3authProvider);
-        const signer = await active_provider.getSigner();
-        const active_account = await signer.getAddress();
-        setAccount(active_account);
-        localStorage.setItem("account", active_account);
-        const res = await getWalletChallenge(active_account);
-        if (res.result !== null) {
-          const signature = await signMessage(res.result.challenge);
-          if (signature) {
-            const authenticate = await userAuthenticate(active_account, signature);
-            if (authenticate.result) {
-              localStorage.setItem('signature', signature);
-              localStorage.setItem('expire_time', res.result.expire_date);
-              const profileRes = await getUserProfile(active_account, signature);
-              if (profileRes.result.profile) {
-                localStorage.setItem("user_id", profileRes.result.profile._id);
-                localStorage.setItem("email", profileRes.result.profile.email);
-                localStorage.setItem("name", profileRes.result.profile.name);
-                localStorage.setItem("telegram", profileRes.result.profile.telegram);
-                const instance_id = await getInstanceId(active_account);
-                if (instance_id) {
-                  const instance = await getSafeInstance(active_account, instance_id, signature);
-                  console.log(instance);
-                  localStorage.setItem("instance_id", instance_id);
-                  localStorage.setItem("dex", instance?.result?.dex);
-                  localStorage.setItem("pair", instance?.result?.pair);
-                  localStorage.setItem("gnosis_addr", instance?.result?.safe_address);
-                  localStorage.setItem("strategy", instance?.result?.strategy);
-                  localStorage.setItem("setting1", instance?.result?.setting_1);
-                  localStorage.setItem("setting2", instance?.result?.setting_2);
-                  localStorage.setItem("setting3", instance?.result?.setting_3);
-                  localStorage.setItem("setting4", instance?.result?.setting_4);
-                  localStorage.setItem("setting5", instance?.result?.setting_5);
-                  if (instance?.result?.trade_module === "") {
-                    setProfileStatus(2);
-                  } else if(instance?.result?.allowed === false) {
-                    localStorage.setItem("gnosis_module", instance?.result?.trade_module);
-                    setProfileStatus(2);
-                  } else if(instance?.result?.deposited === false) {
-                    localStorage.setItem("gnosis_module", instance?.result?.trade_module);
-                    localStorage.setItem("allowed", "1");
-                    setProfileStatus(3);
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  const handleTAndC = () => {
+    setOpen(true);
+  }
+
+  const login = async () => {
+    if (web3auth && isChecked) {
+      try {
+        const web3authProvider = await web3auth.connect();
+        if (web3authProvider !== null) {
+          const active_provider = new ethers.BrowserProvider(web3authProvider);
+          const signer = await active_provider.getSigner();
+          const active_account = await signer.getAddress();
+          setAccount(active_account);
+          localStorage.setItem("account", active_account);
+          const res = await getWalletChallenge(active_account);
+          if (res.result !== null) {
+            const signature = await signMessage(res.result.challenge);
+            if (signature) {
+              const authenticate = await userAuthenticate(active_account, signature);
+              if (authenticate.result) {
+                localStorage.setItem('signature', signature);
+                localStorage.setItem('expire_time', res.result.expire_date);
+                const profileRes = await getUserProfile(active_account, signature);
+                if (profileRes.result.profile) {
+                  localStorage.setItem("user_id", profileRes.result.profile._id);
+                  localStorage.setItem("email", profileRes.result.profile.email);
+                  localStorage.setItem("name", profileRes.result.profile.name);
+                  localStorage.setItem("telegram", profileRes.result.profile.telegram);
+                  const instance_id = await getInstanceId(active_account);
+                  if (instance_id) {
+                    const instance = await getSafeInstance(active_account, instance_id, signature);
+                    console.log(instance);
+                    localStorage.setItem("instance_id", instance_id);
+                    localStorage.setItem("dex", instance?.result?.dex);
+                    localStorage.setItem("pair", instance?.result?.pair);
+                    localStorage.setItem("gnosis_addr", instance?.result?.safe_address);
+                    localStorage.setItem("strategy", instance?.result?.strategy);
+                    localStorage.setItem("setting1", instance?.result?.setting_1);
+                    localStorage.setItem("setting2", instance?.result?.setting_2);
+                    localStorage.setItem("setting3", instance?.result?.setting_3);
+                    localStorage.setItem("setting4", instance?.result?.setting_4);
+                    localStorage.setItem("setting5", instance?.result?.setting_5);
+                    if (instance?.result?.trade_module === "") {
+                      setProfileStatus(2);
+                    } else if (instance?.result?.allowed === false) {
+                      localStorage.setItem("gnosis_module", instance?.result?.trade_module);
+                      setProfileStatus(2);
+                    } else if (instance?.result?.deposited === false) {
+                      localStorage.setItem("gnosis_module", instance?.result?.trade_module);
+                      localStorage.setItem("allowed", "1");
+                      setProfileStatus(3);
+                    } else {
+                      localStorage.setItem("gnosis_module", instance?.result?.trade_module);
+                      localStorage.setItem("allowed", "1");
+                      localStorage.setItem("deposited", "1");
+                      setProfileStatus(4);
+                    }
                   } else {
-                    localStorage.setItem("gnosis_module", instance?.result?.trade_module);
-                    localStorage.setItem("allowed", "1");
-                    localStorage.setItem("deposited", "1");
-                    setProfileStatus(4);
+                    localStorage.removeItem("instance_id");
+                    localStorage.removeItem("gnosis_addr");
+                    localStorage.removeItem("gnosis_module");
+                    localStorage.removeItem("allowed");
+                    setProfileStatus(1);
                   }
                 } else {
+                  localStorage.removeItem("user_id");
+                  localStorage.removeItem("name");
+                  localStorage.removeItem("email");
+                  localStorage.removeItem("telegram");
                   localStorage.removeItem("instance_id");
                   localStorage.removeItem("gnosis_addr");
                   localStorage.removeItem("gnosis_module");
                   localStorage.removeItem("allowed");
-                  setProfileStatus(1);
+                  setProfileStatus(0);
                 }
+                setLoggedIn(true);
               } else {
-                localStorage.removeItem("user_id");
-                localStorage.removeItem("name");
-                localStorage.removeItem("email");
-                localStorage.removeItem("telegram");
-                localStorage.removeItem("instance_id");
-                localStorage.removeItem("gnosis_addr");
-                localStorage.removeItem("gnosis_module");
-                localStorage.removeItem("allowed");
-                setProfileStatus(0);
+                logout();
               }
-              setLoggedIn(true);
-            } else {
-              logout();
             }
+          } else {
+            localStorage.removeItem('signature');
+            localStorage.removeItem('expire_time');
+            setLoggedIn(false);
           }
-        } else {
-          localStorage.removeItem('signature');
-          localStorage.removeItem('expire_time');
-          setLoggedIn(false);
         }
+      } catch (error) {
+        setLoggedIn(false);
+        console.error(error);
       }
-    } catch (error) {
-      setLoggedIn(false);
-      console.error(error);
+    } else {
+      uiConsole("web3auth not initialized yet");
+      return;
     }
   };
 
@@ -287,10 +319,10 @@ function App() {
                 if (dex) {
                   const allowed = localStorage.getItem("allowed");
                   const deposited = localStorage.getItem("deposited");
-                  
+
                   if (deposited) {
                     setProfileStatus(4);
-                  } else if(allowed) {
+                  } else if (allowed) {
                     setProfileStatus(3);
                   } else {
                     setProfileStatus(2);
@@ -339,8 +371,8 @@ function App() {
                 Web3 Login
               </button>
               <div className="web3-login-container1">
-                <input type="radio" name="radio" className="web3-login-radiobutton" />
-                <span className="web3-login-text3">By Siging in you are agreeing to our Terms and Conditons.</span>
+                <input type="radio" name="radio" className="web3-login-radiobutton" onClick={handleChecked} />
+                <span className="web3-login-text3">By Signing in you are agreeing to our <a href='#' style={{ color: 'blue' }} onClick={handleTAndC}>Terms and Conditons</a>.</span>
               </div>
             </div>
           </div>
@@ -373,6 +405,35 @@ function App() {
             }
           </div>
         }
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          className="modal-dialog modal-lg"
+
+        >
+          <Box sx={style}>
+            <Typography variant="h4">Terms and Conditions - Hummingbot Platform</Typography>
+            <Typography variant="body1"><strong>Effective Date:</strong> 12-14-2023</Typography>
+            <Typography variant="body1">Please read these Terms and Conditions carefully before using the Hummingbot Platform provided by Gamut. By accessing or using the Platform, you agree to be bound by these Terms. If you do not agree with any part of these Terms, you may not access or use the Platform.</Typography>
+            <Typography variant="h6">1. Overview</Typography>
+            <Typography variant="body1">1.1 The Hummingbot Platform is a software application that allows users to automate cryptocurrency trading strategies on supported exchanges.</Typography>
+            <Typography variant="body1">1.2 By using the Platform, you acknowledge that cryptocurrency trading involves significant risks, and you understand and accept these risks. We do not provide financial advice, and any trading decisions made using the Platform are solely your responsibility.</Typography>
+            <Typography variant="h6">2. Registration and Account</Typography>
+            <Typography variant="body1">2.1 In order to use the Platform, you must create an account and provide accurate and complete information. You are responsible for maintaining the confidentiality of your account credentials and are fully responsible for all activities that occur under your account.</Typography>
+            <Typography variant="body1">2.2 You must be at least 18 years old or the age of majority in your jurisdiction to use the Platform.</Typography>
+            <Typography variant="h6">3. Use of the Platform</Typography>
+            <Typography variant="body1">3.1 The Platform is provided on an "as is" and "as available" basis. We do not guarantee that the Platform will be uninterrupted, error-free, or secure.</Typography>
+            <Typography variant="body1">3.2 You agree not to use the Platform for any illegal, unauthorized, or prohibited purposes. You will comply with all applicable laws, rules, and regulations while using the Platform.</Typography>
+            <Typography variant="body1">3.3 You are solely responsible for the strategies you implement and the trades executed using the Platform. We are not liable for any losses, damages, or legal consequences resulting from your use of the Platform.</Typography>
+            <Typography variant="h6">4. Intellectual Property</Typography>
+            <Typography variant="body1">4.1 The Platform and all related intellectual property rights are owned by us or our licensors. You are granted a limited, non-exclusive, non-transferable license to use the Platform for your personal or internal business purposes.</Typography>
+            <Typography variant="body1">4.2 You may not modify, distribute, reproduce, or create derivative works based on the Platform, except as expressly authorized by us in writing.</Typography>
+            <Typography variant="h6">5. Privacy</Typography>
+            <Typography variant="body1">5.1 We collect and process personal information in accordance with our Privacy Policy. By using the Platform, you consent to the collection, use, and disclosure of your personal information as described in the Privacy Policy.</Typography>
+          </Box>
+        </Modal>
       </div>
     </>
   );
