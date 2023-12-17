@@ -299,11 +299,12 @@ function App() {
         web3auth.configureAdapter(torusWalletAdapter);
 
         setWeb3auth(web3auth);
-        await web3auth.initModal();
         const c_expire_time = localStorage.getItem("expire_time");
         const c_time = new Date();
         const c_timestamp = c_time.getTime();
         if (Number(c_timestamp) < Number(c_expire_time) * 1000) {
+          if (!loggedIn)
+            await web3auth.initModal();
           const web3authProvider = await web3auth.connect();
           if (web3authProvider) {
             const provider = new ethers.BrowserProvider(web3authProvider);
@@ -370,9 +371,9 @@ function App() {
               <button onClick={login} className="card" style={{ width: 200 }}>
                 Web3 Login
               </button>
-              <div className="web3-login-container1">
-                <input type="radio" name="radio" className="web3-login-radiobutton" onClick={handleChecked} />
-                <span className="web3-login-text3">By Signing in you are agreeing to our <a href='#' style={{ color: 'blue' }} onClick={handleTAndC}>Terms and Conditons</a>.</span>
+              <div className="web3-login-container1" style={{ marginTop: "4px", display: "flex", flexDirection: "row" }}>
+                <div><input type="radio" name="radio" className="web3-login-radiobutton" onClick={handleChecked} style={{ height: "30px" }} /></div>
+                <span className="web3-login-text3">By Signing in you are agreeing to our <a href='#' style={{ color: 'blue', top: "3px" }} onClick={handleTAndC}>Terms and Conditons</a>.</span>
               </div>
             </div>
           </div>

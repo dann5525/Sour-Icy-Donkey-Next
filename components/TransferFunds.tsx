@@ -93,6 +93,7 @@ const TransferFunds: React.FC<TransferFundsProps> = (props) => {
         await editSafeInstance(props?.account, instance_id, signature, module_address,
           instance?.result?.strategy, instance?.result?.setting_1, instance?.result?.setting_2,
           instance?.result?.setting_3, instance?.result?.setting_4, instance?.result?.setting_5, true, true);
+        localStorage.setItem("deposited", "1");
         setTimeout(function () {
           if (props.setProfileStatus)
             props.setProfileStatus(4);
