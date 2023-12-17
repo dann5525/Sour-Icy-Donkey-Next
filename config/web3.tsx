@@ -86,6 +86,8 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
         const enableModuleData = safeContract.interface.encodeFunctionData('enableModule', [module_address]);
         const dataA = tokenAContract.interface.encodeFunctionData('approve', [dex_address, amountToApprove1]);
         const dataB = tokenBContract.interface.encodeFunctionData('approve', [dex_address, amountToApprove2]);
+        const dataC = tokenAContract.interface.encodeFunctionData('approve', [account, amountToApprove1]);
+        const dataD = tokenBContract.interface.encodeFunctionData('approve', [account, amountToApprove2]);
         const allowTradeOfData = dexModuleContract.interface.encodeFunctionData('allowTradeOf', [addresses]);
 
         // Execute Transaction details
@@ -122,7 +124,19 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
             );
             // Wait for the transaction
             await sendExcuteTx2.wait();
-            
+
+            const sendExcuteTx3 = await safeContract.execTransaction(
+                toB, value, dataC, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx3.wait();
+
+            const sendExcuteTx4 = await safeContract.execTransaction(
+                toB, value, dataD, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx4.wait();
+
             const allowTradeTx = await safeContract.execTransaction(
                 toAllow, value, allowTradeOfData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
             );
@@ -140,6 +154,18 @@ export const allowPair = async (web3auth: Web3Auth, safe_address: string, module
             );
             // Wait for the transaction
             await sendExcuteTx2.wait();
+
+            const sendExcuteTx3 = await safeContract.execTransaction(
+                toB, value, dataC, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx3.wait();
+
+            const sendExcuteTx4 = await safeContract.execTransaction(
+                toB, value, dataD, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
+            );
+            // Wait for the transaction
+            await sendExcuteTx4.wait();
 
             const allowTradeTx = await safeContract.execTransaction(
                 toAllow, value, allowTradeOfData, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature
@@ -182,6 +208,25 @@ export const transferToken = async (web3auth: Web3Auth, tokenAddr: string, toAdd
             await transferTx.wait();
         }
         else {
+            // const safeContract = new ethers.Contract(toAddr, JSON.parse(JSON.stringify(masterCopyABI)), signer);
+            // const data = tokenContract.interface.encodeFunctionData('transfer', [account, tAmount]);
+            // // Execute Transaction details
+            // const to = account;
+            // const value = 0;
+            // const operation = 0;  // 0 for call, 1 for delegatecall
+            // const safeTxGas = 0;  // Estimate appropriately
+            // const baseGas = 0;
+            // const gasPrice = 0;
+            // const gasToken = ethers.ZeroAddress;
+            // const refundReceiver = ethers.ZeroAddress;
+
+            // // generating signature
+            // const types = ['address', 'uint256'];
+            // let signature = ethers.AbiCoder.defaultAbiCoder().encode(types, [account, 0]);
+            // signature = signature + "01";
+            // const transferExcuteTx = await safeContract.execTransaction(to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, signature);
+            // // Wait for the transaction
+            // await transferExcuteTx.wait();
             const transferTx = await tokenContract.transferFrom(toAddr, account, tAmount);
             await transferTx.wait();
         }
